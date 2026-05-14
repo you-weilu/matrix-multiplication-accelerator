@@ -93,11 +93,9 @@ class RxFifo:
     def __init__(self, ...):
         self._buf = deque()
 
-    @property
     def full(self):
         return len(self._buf) >= self.DEPTH
 
-    @property
     def empty(self):
         return len(self._buf) == 0
 
