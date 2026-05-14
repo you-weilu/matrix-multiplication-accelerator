@@ -49,7 +49,7 @@ rx_fifo = RxFifo(in_data=rx_tdata, in_valid=rx_tvalid, out_ready=rx_tready, ...)
 
 Both `mac` and `rx_fifo` hold a reference to the same `Signal` object, so when one writes `sig.val`, the other immediately reads the updated value — same as a shared wire.
 
-For AXI-Stream buses (which appear on the FIFO↔MAC interfaces), the three signals `tdata`, `tvalid`, and `tready` are bundled into a small struct to reduce the number of arguments:
+For AXI-Stream buses (which appear on the FIFO↔MAC interfaces), the three signals `tdata`, `tvalid`, and `tready` are bundled into a small class to reduce the number of arguments:
 
 ```python
 class AXIStream:
