@@ -1,6 +1,7 @@
 # RX FIFO
-# Description: buffers incoming AXI-Stream data
-# from the Ethernet MAC before the Parser reads it.
+# Description: buffers incoming AXI-Stream data from the Ethernet MAC before
+# the Parser reads it. In hardware this is will likely be an async FIFO to handle 
+# the clock domain crossing between the MAC and user logic.
 
 from collections import deque
 from signal import Signal, AXIStream
@@ -35,11 +36,11 @@ class RXFIFO:
         self.axis_in.tready.val = not self.full()
         self.axis_out.tvalid.val = not self.empty()
 
-        # accept data from MAC (if valid && not full)
+        # accept data from MAC (if valid && ready)
         if (self.axis_in.tvalid.val and self.axis_in.tready.val):
             self._buffer.append((self.axis_in.tdata.val, self.axis_in.tlast.val))
 
-        # drive Parser (if ready && not empty)
+        # drive Parser (if valid && ready)
         if (self.axis_out.tvalid.val and self.axis_out.tready.val):
             self.axis_out.tdata.val, self.axis_out.tlast.val = self._buffer.popleft()
         
