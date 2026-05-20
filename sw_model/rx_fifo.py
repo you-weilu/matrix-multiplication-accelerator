@@ -1,18 +1,23 @@
-# RX FIFO
-# Description: buffers incoming AXI-Stream data from the Ethernet MAC before
-# the Parser reads it. In hardware this is will likely be an async FIFO to handle 
-# the clock domain crossing between the MAC and user logic.
+# FIFO
+# Description: generic AXI-Stream FIFO for flow control at the MAC boundary.
+#
+# Instantiated twice in top.py: 
+# RX FIFO (MAC -> Parser)
+# TX FIFO (Control FSM -> MAC). 
+#
+# In hardware both will likely be async FIFOs to handle the clock domain 
+# crossing between user logic and the MAC.
 
 from collections import deque
 from signal import Signal, AXIStream
 
-class RXFIFO:
+class FIFO:
     DEPTH = 512
 
     def __init__(self, axis_in: AXIStream, axis_out: AXIStream, rst: Signal):
         self._buffer = deque()
-        self.axis_in = axis_in # driven by MAC
-        self.axis_out = axis_out # drives Parser
+        self.axis_in = axis_in
+        self.axis_out = axis_out
         self.rst = rst
 
     def empty(self):

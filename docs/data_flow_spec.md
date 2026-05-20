@@ -15,26 +15,31 @@ This document records top-level design decisions for the accelerator data flow. 
 
 The host sends data to the accelerator over UDP. Each UDP payload has the following structure:
 
-| Field   | Size    | Description                                  |
-|---------|---------|----------------------------------------------|
-| Opcode  | TBD     | Command type (see opcodes below)             |
-| Address | 4 bits  | Row index (0–15) within the target BRAM      |
-| Data    | 16 bytes | One row of INT8 values (absent for RUN/READ) |
+| Field   | Size     | Description                             |
+|---------|----------|-----------------------------------------|
+| Opcode  | 2 bits   | Command type (see opcodes below)        |
+| Address | 4 bits   | Row index (0–15) within the target BRAM |
+| Data    | 16 bytes | One row of INT8 values (LOAD only)      |
 
 ### Opcodes
 
-| Opcode        | Payload | Description                          |
-|---------------|---------|--------------------------------------|
-| LOAD_WEIGHT   | Yes     | Write one row into Weight BRAM       |
-| LOAD_ACT      | Yes     | Write one row into Activation BRAM   |
-| RUN           | No      | Trigger matrix multiplication        |
-| READ_OUTPUT   | No      | Request result readback from FPGA    |
+| Opcode      | Encoding | Payload | Description                        |
+|-------------|----------|---------|------------------------------------|
+| LOAD_WEIGHT | 00       | Yes     | Write one row into Weight BRAM     |
+| LOAD_ACT    | 01       | Yes     | Write one row into Activation BRAM |
+| RESET       | 10       | No      | Reset FSM and clear both BRAMs     |
 
-Exact opcode encoding (bit width and values) is TBD.
+### Compute trigger
+
+Compute starts automatically once both BRAMs are fully loaded (all 16 rows written to each). No explicit RUN command is needed — the FSM tracks write counts for each BRAM and triggers compute when both reach 16.
+
+### Result readback
+
+Results are pushed back to the host automatically when compute is done. The FSM streams the full 16×16 result matrix from the Output BRAM through the TX FIFO and MAC back to the host over UDP. The host listens on a UDP socket and receives the result packet without needing to send a request. This is functionally equivalent to a hardware interrupt — the arriving UDP packet wakes up the host application.
 
 ### Variable-length packets
 
-Packets are variable-length. Data packets (LOAD_WEIGHT, LOAD_ACT) carry a 16-byte payload. Command-only packets (RUN, READ_OUTPUT) carry no payload and are shorter. `tlast` is used as the frame-end signal rather than hardcoding a byte count in the parser.
+Data packets (LOAD_WEIGHT, LOAD_ACT) carry a 16-byte payload. RESET carries no payload. `tlast` is used as the frame-end signal rather than hardcoding a byte count in the parser.
 
 ---
 
@@ -56,8 +61,4 @@ On the TX path, our logic must assert `tlast` on the last byte of each outgoing 
 
 ## Open decisions
 
-- Opcode bit width and encoding
-- Compute trigger: does RUN need to be explicit, or does the FSM start automatically once both BRAMs are fully loaded?
-- Weight stationarity: can weights be loaded once and reused across multiple activation inputs, or is it always load-weights → load-activations → run?
-- Result readback: is it host-initiated (READ_OUTPUT command) or does the accelerator push results automatically when compute is done?
 - FPGA-to-host packet format (response payload layout)
