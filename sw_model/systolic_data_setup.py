@@ -1,7 +1,7 @@
 # Systolic Data Setup
 #
-# Timing controller between BRAMs and the systolic array.
-# Operates on one 16x16 tile at a time per invocation.
+# Description: Timing controller between BRAMs and the systolic 
+# array. Operates on one 16x16 tile at a time per invocation.
 #
 # Phase 1 (both run in parallel):
 #   1a: feed weight BRAM rows in reverse into the top of the array
@@ -37,12 +37,11 @@ class DataSetup:
                 self._cycle = 0
 
         elif self._state == 'PRELOAD':
-            # Phase 1a: shift the next weight row into the top of the array.
-            # Reverse order so PE[i][j] ends up with B[i][j] after 16 cycles.
+            # shift the next weight row into the top of the array
             weight_row = self.TILE_SIZE - 1 - self._cycle
             self._array.shift_weights(self._weight_bram.read(weight_row))
 
-            # Phase 1b: copy activation row into the buffer (direct, no transform).
+            # copy activation row into the buffer
             self._buffer[self._cycle] = list(self._act_bram.read(self._cycle))
 
             self._cycle += 1
@@ -51,8 +50,7 @@ class DataSetup:
                 self._cycle = 0
 
         elif self._state == 'FEED':
-            # At cycle t, array row k receives buffer[t-k][k] = A[t-k][k].
-            # This feeds column k of A into row k, in top-to-bottom order.
+            # At cycle t, array row k receives buffer[t-k][k] (transposed)
             activations = []
             for row in range(self.TILE_SIZE):
                 t = self._cycle - row

@@ -9,7 +9,9 @@ This document records top-level design decisions for the accelerator data flow. 
 - INT8 matrix multiplication: C = A × B
 - The systolic array is fixed 16×16, but the accelerator supports matrices of arbitrary size that are multiples of 16 in all dimensions (M×K multiplied by K×N)
 - Large matrices are tiled into 16×16 blocks; the Control FSM sequences tile passes through the array
-- Maximum supported dimensions and BRAM sizing: TBD
+- Maximum supported dimensions: 256×256 for M, K, and N
+- Weight and Activation BRAMs each hold one 16×16 tile (256 bytes); for 256×256 matrices, the host reloads tiles across passes
+- Output BRAM holds one 16×16 output tile (256 × 4 = 1 KB, 32-bit elements)
 
 ---
 
@@ -33,7 +35,7 @@ Activation data is sent in natural row-major format — no pre-transformation re
 | LOAD_ACT    | 01       | Yes     | Write one row into Activation BRAM |
 | RESET       | 10       | No      | Reset FSM and clear both BRAMs     |
 
-Note: the current 4-bit address field covers one 16×16 tile (rows 0–15). Extension for tiling (addressing larger BRAMs) is TBD.
+Note: the current 4-bit address field covers one 16×16 tile (rows 0–15). For 256×256 matrices the host addresses up to 256 rows, so the address field must be extended to 8 bits.
 
 ### Compute trigger
 
@@ -78,6 +80,4 @@ Partial sums exit the bottom of the systolic array continuously during activatio
 ## Open decisions
 
 - FPGA-to-host packet format (response payload layout)
-- Maximum supported matrix dimensions
-- BRAM sizing for tiled operation
-- Packet protocol extension for tiling (addressing scheme for larger BRAMs)
+- Packet protocol extension for tiling (8-bit address field encoding and framing)

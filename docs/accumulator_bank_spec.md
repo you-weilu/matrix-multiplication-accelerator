@@ -6,7 +6,9 @@ The Accumulator Bank collects partial sums flowing out of the bottom of the syst
 
 ## Structure
 
-16 accumulators, one per array column. Each holds a 32-bit value to prevent overflow — INT8 × INT8 produces up to 16-bit products, and accumulating 16 of them across multiple tile passes requires wider storage.
+16 accumulators, one per array column. Each holds a 32-bit value to prevent overflow.
+
+Worst case for 256×256 matrices: K = 256, so 16 K-tile passes. Each tile contributes a partial sum of 16 INT8×INT8 products. Maximum product = 127×127 = 16,129 (fits in 15 bits). Maximum accumulator value = 16,129 × 16 PEs × 16 K-tile passes = 4,129,024, which fits in 22 bits. 32-bit accumulators provide ample headroom.
 
 ---
 
