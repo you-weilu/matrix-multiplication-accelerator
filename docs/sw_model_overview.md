@@ -9,6 +9,10 @@ Writing a cycle-accurate Python model before (or alongside) the RTL allows us to
 - Catch architectural bugs early (wrong skew, overflow, off-by-one in FSM states)
 - Generate golden reference outputs to compare against RTL simulation
 
+## Scope: what is and isn't modeled
+
+The Ethernet MAC is a Xilinx IP core and is not modeled in the software simulation. In the sw model, test inputs are injected directly into the RX FIFO, bypassing the MAC entirely. The TX FIFO output is read directly rather than going through a MAC.
+
 ## One class per hardware module
 
 Each block in the block diagram maps to one Python class in `sw_model/`. The class constructor takes its port signals as arguments (see below), and exposes a `tick()` method that models one clock cycle.
