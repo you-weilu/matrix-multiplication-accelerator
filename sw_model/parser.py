@@ -38,7 +38,7 @@ class Parser:
             self.address = None
             return
 
-        self.axis_in.tready.val = True
+        self.axis_in.tready.val = (self.state != "WRITE")
 
         if not (self.axis_in.tvalid.val and self.axis_in.tready.val):
             return
