@@ -9,6 +9,10 @@
 #
 # Opcodes: LOAD_WEIGHT=00, LOAD_ACT=01, RESET=10
 
+# TODO: split read_opcode into read_opcode --> read_addr
+# TODO: dont hardcode 16, use tlast to delimit between rows
+# TODO: implement compute (load brams then compute gives dimensions and triggers start)
+
 from signal import Signal, AXIStream
 from bram import BRAM
 

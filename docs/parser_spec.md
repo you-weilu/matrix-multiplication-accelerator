@@ -1,23 +1,31 @@
 # Parser Spec
 
-The Parser reads AXI-Stream data from the RX FIFO and decodes incoming UDP packets. It skips the first 28 bytes (20B IP header + 8B UDP header), then extracts the opcode and row address from a single packed byte, followed by 16 bytes of data payload for LOAD opcodes. Based on the opcode it routes the completed row to the correct BRAM or signals the Control FSM to reset.
+The Parser reads AXI-Stream data from the RX FIFO and decodes incoming UDP packets. It skips the first 28 bytes (20B IP header + 8B UDP header), then extracts the opcode from one byte and routes accordingly. For LOAD opcodes it reads a row address then streams the payload into the target BRAM in 16-byte chunks using tlast as the row delimiter. For COMPUTE it reads three dimension bytes and pulses the Control FSM. For RESET it pulses the Control FSM immediately.
 
 ---
 
 ## Interface
 
-| Signal         | Width    | Direction | Description                              |
-|----------------|----------|-----------|------------------------------------------|
-| tdata          | 8 bits   | Input     | AXI-Stream data byte from RX FIFO        |
-| tvalid         | 1 bit    | Input     | AXI-Stream valid from RX FIFO            |
-| tready         | 1 bit    | Output    | AXI-Stream ready to RX FIFO              |
-| tlast          | 1 bit    | Input     | AXI-Stream end of frame from RX FIFO     |
-| bram_we        | 1 bit    | Output    | Write enable to target BRAM              |
-| bram_addr      | 4 bits   | Output    | Row address to target BRAM (0-15)        |
-| bram_data      | 128 bits | Output    | Row data to target BRAM (16 × INT8)      |
-| bram_sel       | 1 bit    | Output    | BRAM select: 0 = Weight, 1 = Activation  |
-| rst_out        | 1 bit    | Output    | Pulse to Control FSM on RESET opcode     |
-| rst            | 1 bit    | Input     | Global reset (active high)               |
+| Signal         | Width    | Direction | Description                                          |
+|----------------|----------|-----------|------------------------------------------------------|
+| tdata          | 8 bits   | Input     | AXI-Stream data byte from RX FIFO                    |
+| tvalid         | 1 bit    | Input     | AXI-Stream valid from RX FIFO                        |
+| tready         | 1 bit    | Output    | AXI-Stream ready to RX FIFO                          |
+| tlast          | 1 bit    | Input     | AXI-Stream end of frame from RX FIFO                 |
+| bram_we        | 1 bit    | Output    | Write enable to target BRAM                          |
+| bram_addr      | 12 bits  | Output    | BRAM address: row (bits 11–4) + chunk (bits 3–0)     |
+| bram_data      | 128 bits | Output    | 16-byte chunk to target BRAM                         |
+| bram_sel       | 1 bit    | Output    | BRAM select: 0 = Weight, 1 = Activation              |
+| rst_out        | 1 bit    | Output    | Pulse to Control FSM on RESET opcode                 |
+| compute_out    | 1 bit    | Output    | Pulse to Control FSM on COMPUTE opcode               |
+| m_tiles        | 4 bits   | Output    | Row tile count from COMPUTE packet (1–16)            |
+| k_tiles        | 4 bits   | Output    | K tile count from COMPUTE packet (1–16)              |
+| n_tiles        | 4 bits   | Output    | Column tile count from COMPUTE packet (1–16)         |
+| rst            | 1 bit    | Input     | Global reset (active high)                           |
+
+`bram_addr` encodes the flat BRAM address: `row * 16 + chunk`, where `row` is the 8-bit row index from the packet and `chunk` is the 4-bit column chunk counter incremented by the parser as each 16-byte group is written.
+
+`compute_out`, `m_tiles`, `k_tiles`, and `n_tiles` are all valid on the same cycle that `compute_out` is pulsed.
 
 ---
 
@@ -26,47 +34,69 @@ The Parser reads AXI-Stream data from the RX FIFO and decodes incoming UDP packe
 After the 28-byte IP+UDP header skip:
 
 ```
-Byte 28: [ opcode (bits 7-6) | address (bits 5-2) | padding (bits 1-0) ]
-Bytes 29-44: data payload (16 bytes, LOAD opcodes only)
+Byte 28: [ opcode (bits 7–6) | padding (bits 5–0) ]
+
+LOAD_WEIGHT / LOAD_ACT:
+  Byte 29:        row address (8 bits)
+  Bytes 30–tlast: data payload (one full matrix row)
+
+COMPUTE:
+  Byte 29: M_tiles (8 bits, upper 4 unused, lower 4 = tile count)
+  Byte 30: K_tiles
+  Byte 31: N_tiles (tlast asserted here)
+
+RESET:
+  No payload (tlast asserted on byte 28)
 ```
 
 ### Opcodes
 
-| Opcode      | Encoding | Payload |
-|-------------|----------|---------|
-| LOAD_WEIGHT | 00       | Yes     |
-| LOAD_ACT    | 01       | Yes     |
-| RESET       | 10       | No      |
+| Opcode      | Encoding | Payload                  |
+|-------------|----------|--------------------------|
+| LOAD_WEIGHT | 00       | Row address + matrix row |
+| LOAD_ACT    | 01       | Row address + matrix row |
+| RESET       | 10       | None                     |
+| COMPUTE     | 11       | M_tiles, K_tiles, N_tiles|
+
+---
 
 ## Internal state machine
 
-The parser moves through five states on each valid AXI-Stream beat (tvalid && tready):
+The parser moves through states on each valid AXI-Stream beat (tvalid && tready):
 
 ### IDLE
-Resting state. Parser asserts tready=1 to signal it is ready to accept data. When the RX FIFO asserts tvalid=1, a handshake occurs and the parser transitions to SKIP_HEADER on that beat, consuming the first byte. All error recovery and normal completion paths return here.
+Resting state. Parser asserts tready=1. When tvalid=1 a handshake occurs and the parser transitions to SKIP_HEADER on that beat, consuming the first byte.
 
 ### SKIP_HEADER
-Counts through the first 28 bytes (IP + UDP headers) and discards them. Transitions to READ_OPCODE when counter reaches 28.
+Counts through the first 28 bytes (IP + UDP headers) and discards them. Transitions to READ_OPCODE when the counter reaches 28.
 
 ### READ_OPCODE
-Reads one byte, extracts opcode and address using shift and mask. Transitions to READ_DATA if opcode is LOAD_WEIGHT or LOAD_ACT. Asserts rst_out and returns to IDLE if opcode is RESET.
+Reads one byte, extracts the opcode from bits 7–6:
+- LOAD_WEIGHT or LOAD_ACT → READ_ADDR
+- COMPUTE → READ_DIMS
+- RESET → assert rst_out, return to IDLE
+
+### READ_ADDR
+Reads one byte as the 8-bit row address. Resets the chunk counter to 0. Transitions to READ_DATA.
 
 ### READ_DATA
-Accumulates 16 bytes into an internal row buffer, one byte per cycle. Increments a byte counter each cycle. Transitions to WRITE when 16 bytes have been received.
+Accumulates incoming bytes into a 16-byte chunk buffer. Every time 16 bytes have been collected, the parser writes that chunk to the target BRAM at address `row * 16 + chunk`, increments the chunk counter, and clears the buffer. If tlast arrives on the 16th byte of a chunk, the write completes and the parser returns to IDLE. If tlast arrives before the 16th byte, the partial chunk is discarded and the parser returns to IDLE (truncated packet).
 
-### WRITE
-Writes the completed row buffer to the correct BRAM (weight or activation) at the row address extracted in READ_OPCODE. Returns to IDLE on the next cycle.
+Writes happen inline every 16 bytes — no separate WRITE state needed.
+
+### READ_DIMS
+Reads three consecutive bytes as M_tiles, K_tiles, N_tiles. On the third byte, asserts compute_out for one cycle with all three values valid, then returns to IDLE. If tlast arrives before the third byte the packet is truncated and compute_out is not asserted.
 
 ---
 
 ## tlast handling
 
-If tlast is asserted at any point before the parser has finished reading the expected number of bytes, the packet is treated as truncated. The partial data is discarded and the parser returns to IDLE.
+tlast is the primary signal that ends a packet. A well-formed LOAD packet has tlast on the last byte of the final 16-byte chunk. A well-formed COMPUTE packet has tlast on the N_tiles byte. If tlast arrives early in any state, the parser discards any partial state and returns to IDLE without asserting compute_out or writing partial BRAM chunks.
 
-As an optional enhancement, the parser could signal the Control FSM to send a NACK (negative acknowledgement) packet back to the host when a truncated packet is detected. The host would then know to retransmit. This is not implemented in the initial version but is a natural extension for improved reliability.
+As an optional enhancement, the parser could signal the Control FSM to send a NACK on truncated packets so the host can retransmit. Not implemented in the initial version.
 
 ---
 
 ## Reset behavior
 
-On global reset (rst): parser returns to IDLE, byte counters and row buffer are cleared.
+On global reset (rst): parser returns to IDLE, all counters, the chunk buffer, and dimension registers are cleared.
