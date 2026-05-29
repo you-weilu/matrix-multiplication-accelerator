@@ -9,7 +9,7 @@
 # crossing between user logic and the MAC.
 
 from collections import deque
-from signal import Signal, AXIStream
+from .signal import Signal, AXIStream
 
 class FIFO:
     DEPTH = 512

@@ -17,7 +17,7 @@ class Parser:
     LOAD_ACT = 0b01
     RESET = 0b10
 
-    def __init__(self, axis_in: AXIStream, weight_bram: BRAM, act_bram: BRAM, rst_out: Signal, rst: Signal):
+    def __init__(self, axis_in: AXIStream, weight_bram: BRAM, act_bram: BRAM, rst_out: Signal, rst: Signal, write_signal: Signal):
         self.state = "IDLE"
         self.byte_count = 0
         self.row_buf = []
@@ -28,8 +28,11 @@ class Parser:
         self.act_bram = act_bram
         self.rst_out = rst_out
         self.rst = rst
+        self.write_signal = Signal(0)
 
     def tick(self):
+        self.write_signal.val = 0
+
         if self.rst.val:
             self.state = "IDLE"
             self.byte_count = 0
@@ -82,6 +85,7 @@ class Parser:
 
         elif self.state == "WRITE":
             bram = self.weight_bram if self.opcode == self.LOAD_WEIGHT else self.act_bram
+            self.write_signal.val = 1
             bram.write(self.address, self.row_buf)
             self.row_buf = []
             self.byte_count = 0
