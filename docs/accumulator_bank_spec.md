@@ -19,6 +19,8 @@ For each output tile C[ti][tj], the K dimension is iterated by the Control FSM. 
 The Control FSM signals whether each tile pass is an intermediate accumulation or the final K-tile pass:
 
 - **Intermediate pass**: add incoming partial sums to accumulators, hold
-- **Final pass**: add incoming partial sums, then write the completed 16×16 output tile row by row to Output BRAM and clear accumulators for the next output tile
+- **Final pass**: add incoming partial sums, then write the completed 16×16 output tile row by row into the inactive output buffer and clear accumulators for the next output tile
+
+The output uses a double buffer (two 16×16 INT32 buffers, 1 KB each). While the Accumulator Bank writes into one buffer, the Control FSM streams the other to the TX FIFO. The Control FSM signals which buffer is inactive before triggering the final pass write.
 
 Since we have a weight stationary systolic array, there is no separate drain phase as partial sums exit the array naturally as activations flow through.
