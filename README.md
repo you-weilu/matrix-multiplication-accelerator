@@ -6,7 +6,7 @@ The full matrices live in host RAM. The on-chip design holds only two ping-pong 
 
 ## Block Diagram
 
-![Block Diagram](docs/block%20diagram.png)
+![Block Diagram](docs/block_diagram.png)
 
 ## Architecture
 
