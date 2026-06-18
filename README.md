@@ -1,32 +1,36 @@
 # Matrix Multiplication Accelerator
 
-A fixed-function hardware accelerator for General Matrix Multiplication (GEMM — C = A × B), targeting the Digilent Arty A7-100T FPGA. Inspired by the Google TPU v1 architecture, it implements the core compute pipeline: a 16×16 systolic array, weight and activation buffers, and an accumulator bank, all backed by Block RAM. The host communicates with the accelerator over Gigabit Ethernet using a lightweight UDP protocol, eliminating the need for PCIe or a custom kernel driver.
+A fixed-function hardware accelerator for General Matrix Multiplication (GEMM — C = A × B), targeting the ALINX AX7103 FPGA board (Xilinx XC7A100T). Inspired by the Google TPU v1 architecture, it implements a 16×16 INT8 weight-stationary systolic array backed by a tile-streaming memory subsystem. The host communicates with the accelerator over PCIe Gen2 x4 via the Xilinx XDMA IP core, using a C++ API backed by a Linux PCIe kernel driver.
+
+The full matrices live in host RAM. The on-chip design holds only two ping-pong tile buffers per operand (4 × 256 bytes) and a 1 KB output buffer. A Tile Sequencer FSM autonomously sequences the entire tiling loop — fetching tiles from host RAM via XDMA, driving the compute pipeline, and writing results back — with no host CPU involvement between tiles.
 
 ## Block Diagram
 
-![Block Diagram](docs/Block%20Diagram.png)
+![Block Diagram](docs/block%20diagram.png)
 
 ## Architecture
 
 Data flows from the host through the accelerator and back as follows:
 
-**Receive path:** The host sends matrix data over UDP. The on-chip Ethernet MAC receives frames and passes them via AXI-Stream into an RX FIFO. A Parser decodes the incoming packets, routing weight data into the Weight BRAM and activation data into the Activation BRAM.
+**Setup:** The host writes matrix dimensions (M, K, N) and the base addresses of A, B, and C in host RAM into the CSR Block over PCIe, then asserts the START bit. The XDMA IP core translates PCIe TLPs into AXI4 transactions on the internal interconnect.
 
-**Compute path:** The Systolic Data Setup block reads from both BRAMs and skews the data correctly for systolic array ingestion. The 16×16 INT8 Systolic Array then performs the matrix multiply — each processing element computes a multiply-accumulate each cycle, with partial sums propagating through the array. Results flow into the Accumulator Bank.
+**Tile fetch (double-buffered):** The Tile Sequencer FSM commands XDMA via AXI to DMA each 16×16 weight tile and activation tile from host RAM into the on-chip ping-pong buffers. While the systolic array processes one tile pair, XDMA loads the next pair into the shadow buffers.
 
-**Transmit path:** Accumulated results are written to the Output BRAM. The Control FSM (which connects to all blocks) orchestrates readback — streaming results through the TX FIFO and Ethernet MAC back to the host over UDP.
+**Compute path:** The Systolic Data Setup block reads from the active ping-pong buffers and skews the data correctly for systolic array ingestion. The 16×16 INT8 Systolic Array performs the matrix multiply — each PE computes one INT8 MAC per cycle, with partial sums propagating downward through each column into the Accumulator Bank.
+
+**Result writeback:** After the final K-tile pass for each output tile, the Accumulator Bank writes the completed 16×16 INT32 tile into the Output Buffer. The Tile Sequencer FSM then commands XDMA to DMA the result back to the correct offset in host RAM. When all output tiles are done, the FSM asserts an interrupt to notify the host.
 
 ### Key blocks
 
 | Block | Description |
 |---|---|
-| Ethernet MAC | Gigabit Ethernet interface; AXI-Stream to/from the data path |
-| RX FIFO / TX FIFO | Clock-domain crossing and flow control between MAC and logic |
-| Parser | Decodes UDP payload, extracts opcode/address/data fields |
-| Weight BRAM | Stores the weight matrix (stationary operand, TPU-style) |
-| Activation BRAM | Stores the input activation matrix |
-| Systolic Data Setup | Skews input data for correct systolic array feed timing |
+| XDMA IP Core | Xilinx PCIe Gen2 x4 DMA engine; presents AXI4 master/slave interfaces on-chip |
+| AXI Interconnect | Routes AXI4 transactions between XDMA, the ping-pong buffers, and the CSR Block |
+| CSR Block | Memory-mapped control/status registers; holds matrix dimensions, host base addresses, START, and interrupt status |
+| Weight Buffer ×2 | Ping-pong pair of 256-byte register buffers holding the current and next weight tile |
+| Activation Buffer ×2 | Ping-pong pair of 256-byte register buffers holding the current and next activation tile |
+| Systolic Data Setup | Reads the active ping-pong buffers and skews activation data for weight-stationary systolic feed |
 | 16×16 INT8 Systolic Array | 256 PEs arranged in a 2-D mesh; each PE does one INT8 MAC/cycle |
-| Accumulator Bank | Accumulates 32-bit partial sums from the systolic array columns |
-| Output BRAM | Holds the completed result matrix pending readback |
-| Control FSM | Global sequencer; drives all block enables and address counters |
+| Accumulator Bank | Accumulates 32-bit partial sums across K-tile passes; writes completed tiles to the Output Buffer |
+| Output Buffer | 1 KB register buffer holding one completed 16×16 INT32 output tile pending XDMA writeback |
+| Tile Sequencer FSM | Autonomous tiling loop controller; drives XDMA fetches, compute pipeline, writeback, and the final interrupt |

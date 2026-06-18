@@ -6,99 +6,95 @@ This document records top-level design decisions for the accelerator data flow. 
 
 ## Matrix dimensions
 
-- INT8 matrix multiplication: C = A × B
-- The systolic array is fixed 16×16, but the accelerator supports matrices of arbitrary size in all dimensions (M×K multiplied by K×N)
-- Maximum supported dimensions: 240×240 for M, K, and N (240 = 15×16, giving a maximum of 15 tile blocks per dimension)
-- All dimensions must be multiples of 16. Non-multiples must be zero-padded by the host to the next multiple of 16 before sending. The host discards the corresponding padded rows/columns from the output.
-- Large matrices are tiled into 16×16 blocks; the Control FSM and SDS handle all tiling on-chip after the host loads the full matrices.
+- INT8 matrix multiplication: C = A × B, where A is M×K and B is K×N, producing C as M×N INT32
+- The systolic array is fixed 16×16; arbitrary matrix sizes are supported by tiling
+- No hard upper bound on M, K, or N — the full matrices live in host RAM
+- All dimensions must be multiples of 16. Non-multiples must be zero-padded by the host to the next multiple of 16. The host discards the corresponding padded rows/columns from the output.
 
 ---
 
-## BRAM organization
+## Memory organization
 
-Weight and Activation BRAMs each hold one full matrix (up to 240×240 INT8 = 57,600 bytes). Each row is 240 bytes wide, which is exactly 15 chunks of 16 bytes. Each BRAM is organized as a flat array of 16-byte words:
+### Host RAM
 
-```
-address = row_index × 15 + col_chunk
-```
+The full matrices A, B, and C reside in host RAM as flat row-major arrays of the appropriate element type (INT8 for A and B, INT32 for C). The host writes the physical base addresses of each matrix into the CSR Block before asserting START.
 
-where `row_index` is 0–239 and `col_chunk` is 0–14. Total: 3600 addresses × 128 bits = 57,600 bytes per BRAM.
+### On-chip ping-pong buffers
 
-Output uses a double buffer: two 16×16 INT32 tiles (1 KB each, 2 KB total). While the Accumulator Bank writes a completed tile into one buffer, the Control FSM streams the other buffer to the TX FIFO. The roles of the two buffers swap after each output tile.
+The FPGA holds only enough storage for two 16×16 tiles per operand:
 
----
+| Buffer | Count | Size each | Total |
+|--------|-------|-----------|-------|
+| Weight Buffer | 2 (ping-pong) | 256 bytes (16×16 × INT8) | 512 bytes |
+| Activation Buffer | 2 (ping-pong) | 256 bytes (16×16 × INT8) | 512 bytes |
+| Output Buffer | 1 | 1 KB (16×16 × INT32) | 1 KB |
 
-## Host-to-FPGA packet format (UDP payload)
-
-The host sends data to the accelerator over UDP. LOAD packets carry 16 rows of matrix data per packet (a row stripe), which at 240 bytes per row gives a 3,840-byte payload. This exceeds standard Ethernet MTU and requires **jumbo frames** to be enabled on both the host NIC and the FPGA MAC (9,000-byte MTU is sufficient).
-
-Each UDP payload has the following structure:
-
-| Field      | Size       | Description                                   |
-|------------|------------|-----------------------------------------------|
-| Opcode     | 1 byte     | Upper 2 bits = opcode, lower 6 bits = padding |
-| Start row  | 1 byte     | Row index of the first row in this stripe (0–239) |
-| Data       | 16×N bytes | 16 consecutive matrix rows, tlast-delimited   |
-
-The parser does not track individual row boundaries within the payload — it writes 16-byte chunks to consecutive BRAM addresses starting from `start_row × 15`, incrementing the address each chunk until tlast.
-
-Activation data is sent in natural row-major format — no pre-transformation required from the host.
-
-### Opcodes
-
-| Opcode      | Encoding | Payload      | Description                             |
-|-------------|----------|--------------|-----------------------------------------|
-| LOAD_WEIGHT | 00       | Yes (16 rows)| Write a row stripe into Weight BRAM     |
-| LOAD_ACT    | 01       | Yes (16 rows)| Write a row stripe into Activation BRAM |
-| RESET       | 10       | No           | Reset FSM and clear both BRAMs          |
-| COMPUTE     | 11       | 3 bytes      | Start computation with given dimensions |
-
-The COMPUTE packet payload is 3 bytes: M_tiles, K_tiles, N_tiles (1–15 each, 4 bits used), representing the number of 16×16 tile blocks in each dimension. For example, a 32×48×32 multiply sends M_tiles=2, K_tiles=3, N_tiles=2.
-
-### Compute trigger
-
-Compute starts when the parser receives a COMPUTE packet. The parser forwards M_tiles, K_tiles, and N_tiles to the Control FSM, which uses them to sequence all tile passes. The host is responsible for ensuring both BRAMs are fully loaded before sending COMPUTE.
-
-### Result readback
-
-Results are pushed back to the host one tile at a time as each output tile completes, in row-major order (C[0][0], C[0][1], ..., C[1][0], ...). The FSM streams each completed 16×16 INT32 tile (1 KB) from the active output buffer through the TX FIFO and MAC back to the host over UDP. The host places each tile at the correct offset to reconstruct the full output matrix.
-
-### Variable-length packets
-
-LOAD packets carry a fixed 16-row payload at the agreed matrix width. COMPUTE carries a fixed 3-byte payload. RESET carries no payload. `tlast` is used as the frame-end signal for all packets.
+Ping-pong operation: while the Systolic Data Setup reads the *active* weight and activation buffers, XDMA loads the *next* tile pair into the *shadow* buffers. The Tile Sequencer FSM swaps active/shadow roles after each tile pass completes.
 
 ---
 
-## Ethernet framing and header stripping
+## CSR register map
 
-```
-| Ethernet header (14B) | IP header (20B) | UDP header (8B) | Our payload |
-```
+The host configures the accelerator by writing to memory-mapped registers in the CSR Block, accessible over PCIe via the XDMA AXI-Lite slave port.
 
-The Ethernet MAC IP core strips the Ethernet header and places the remainder on AXI-Stream. The parser strips the IP and UDP headers — a fixed 28-byte skip — before decoding the opcode, start row, and data fields.
+| Offset | Name | Width | Description |
+|--------|------|-------|-------------|
+| 0x00 | M_TILES | 16 bits | Number of 16-row tile blocks in the M dimension (1–N) |
+| 0x04 | K_TILES | 16 bits | Number of 16-deep tile blocks in the K dimension (1–N) |
+| 0x08 | N_TILES | 16 bits | Number of 16-column tile blocks in the N dimension (1–N) |
+| 0x10 | A_BASE_ADDR | 64 bits | Base address of matrix A in host RAM |
+| 0x18 | B_BASE_ADDR | 64 bits | Base address of matrix B in host RAM |
+| 0x20 | C_BASE_ADDR | 64 bits | Base address of matrix C in host RAM |
+| 0x28 | CONTROL | 1 bit | Write 1 to START; self-clearing |
+| 0x2C | STATUS | 1 bit | Read 1 when DONE (interrupt flag); write 1 to clear |
 
-On the TX path, `tlast` must be asserted on the last byte of each outgoing packet.
+The host writes all dimension and address registers, then writes CONTROL=1. The FSM begins immediately and the host does not need to touch the accelerator again until it receives the interrupt.
 
 ---
 
-## Tiling and multi-pass computation
+## Tiling and autonomous sequencing
 
-The host loads the full weight matrix B and activation matrix A into their respective BRAMs before compute begins. All tiling is handled on-chip.
+The Tile Sequencer FSM iterates over all output tiles in row-major order (ti = 0..M_TILES-1, tj = 0..N_TILES-1). For each output tile C[ti][tj]:
 
-For each output tile C[ti][tj], the Control FSM iterates over the K dimension:
+1. **K-tile loop** (tk = 0..K_TILES-1):
+   a. Command XDMA to fetch weight tile B[tk][tj] from `B_BASE_ADDR + (tk*16*N + tj*16)` into the shadow Weight Buffer
+   b. Command XDMA to fetch activation tile A[ti][tk] from `A_BASE_ADDR + (ti*16*K + tk*16)` into the shadow Activation Buffer
+   c. Wait for DMA complete; swap active/shadow buffers
+   d. Trigger one tile pass through the Systolic Data Setup → Systolic Array → Accumulator Bank pipeline
+   e. Signal Accumulator Bank: intermediate accumulation (hold) unless tk == K_TILES-1 (final pass)
 
-1. Select weight tile B[tk][tj]: BRAM addresses (tk×16 + r) × 15 + tj for r in 0..15
-2. Select activation tile A[ti][tk]: BRAM addresses (ti×16 + r) × 15 + tk for r in 0..15
-3. Provide tile offsets (ti, tk, tj) to the SDS; trigger tile pass
-4. Signal the Accumulator Bank to accumulate the partial result
-5. Repeat for all K tiles (tk = 0..K_tiles-1)
-6. After the final K tile, the Accumulator Bank writes the completed tile into the inactive output buffer; buffers swap
-7. Stream the completed buffer to the host; advance to the next output tile (ti, tj)
+2. After the final K-tile pass, the Accumulator Bank writes the completed 16×16 INT32 tile into the Output Buffer and clears its accumulators.
 
-Partial sums exit the bottom of the systolic array continuously during activation feeding — there is no separate drain phase.
+3. Command XDMA to write the Output Buffer to `C_BASE_ADDR + (ti*16*N + tj*16)*4` in host RAM.
+
+4. Advance to the next output tile (tj++, wrap to next ti row).
+
+5. After all output tiles are written, assert the STATUS DONE interrupt.
+
+### Double-buffering overlap
+
+DMA fetch for tile (tk+1) overlaps with compute for tile tk. The FSM issues the next DMA command immediately after swapping buffers, before the compute pipeline finishes. The design is compute-bound: the systolic array is active nearly 100% of the time.
+
+---
+
+## Tile addressing in host RAM (row-major)
+
+For matrices stored in row-major order with full row stride:
+
+```
+A tile [ti][tk]: base = A_BASE_ADDR + (ti * 16 * K_full + tk * 16)
+B tile [tk][tj]: base = B_BASE_ADDR + (tk * 16 * N_full + tj * 16)
+C tile [ti][tj]: base = C_BASE_ADDR + (ti * 16 * N_full + tj * 16) * sizeof(int32)
+```
+
+where `K_full = K_TILES * 16` and `N_full = N_TILES * 16`.
+
+Each tile is 16 non-contiguous rows of 16 elements. The XDMA 2D transfer mode is used to fetch/write each tile without copying the full matrix row into a temporary buffer — TBD based on XDMA scatter-gather capability.
 
 ---
 
 ## Open decisions
 
-- FPGA-to-host packet format (response payload layout for result readback)
+- XDMA transfer mode for non-contiguous tile rows (scatter-gather vs. per-row 1D DMA)
+- AXI clock domain crossing strategy between XDMA and the compute pipeline
+- Exact interrupt delivery mechanism (MSI vs. MSI-X)

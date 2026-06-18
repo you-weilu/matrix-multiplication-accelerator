@@ -11,26 +11,25 @@ Writing a cycle-accurate Python model before (or alongside) the RTL allows us to
 
 ## Scope: what is and isn't modeled
 
-The Ethernet MAC is a Xilinx IP core and is not modeled in the software simulation. In the sw model, test inputs are injected directly into the RX FIFO, bypassing the MAC entirely. The TX FIFO output is read directly rather than going through a MAC.
+The XDMA IP core and PCIe link are Xilinx IP and are not modeled in detail. In the sw model, the host injects tile data directly into the ping-pong buffers (bypassing DMA latency) and reads results directly from the Output Buffer. The Tile Sequencer FSM is modeled to validate the tiling loop logic and buffer-swap sequencing; actual AXI command generation is stubbed.
 
 ## One class per hardware module
 
-Each block in the block diagram maps to one Python class in `sw_model/`. The class constructor takes its port signals as arguments (see below), and exposes a `tick()` method that models one clock cycle.
+Each block in the block diagram maps to one Python class in `sw_model/`. The class constructor takes its port signals as arguments, and exposes a `tick()` method that models one clock cycle.
 
 ```
 sw_model/
-  top.py    # instantiates all modules and wires them together
-  ethernet_mac.py
-  rx_fifo.py
-  tx_fifo.py
-  parser.py
-  weight_bram.py
-  activation_bram.py
+  top.py                    # instantiates all modules and wires them together
+  xdma.py                   # stub: injects tiles directly into buffers
+  axi_interconnect.py       # routes AXI transactions (stub in sw model)
+  csr_block.py              # holds dimension/address registers, START, DONE
+  weight_buffer.py          # ping-pong pair of 256-byte tile buffers
+  activation_buffer.py      # ping-pong pair of 256-byte tile buffers
   systolic_data_setup.py
   systolic_array.py
   accumulator_bank.py
-  output_bram.py
-  control_fsm.py
+  output_buffer.py          # 1 KB output tile register buffer
+  tile_sequencer_fsm.py     # autonomous tiling loop controller
 ```
 
 ## How modules talk to each other: shared Signal objects
@@ -43,23 +42,25 @@ class Signal:
         self.val = val
 
 # In top.py:
-rx_tdata  = Signal()
-rx_tvalid = Signal()
-rx_tready = Signal()
+start       = Signal()
+m_tiles     = Signal()
+k_tiles     = Signal()
+n_tiles     = Signal()
 
-mac     = EthernetMAC(..., out_data=rx_tdata, out_valid=rx_tvalid, in_ready=rx_tready)
-rx_fifo = RxFifo(in_data=rx_tdata, in_valid=rx_tvalid, out_ready=rx_tready, ...)
+csr     = CsrBlock(start=start, m_tiles=m_tiles, ...)
+fsm     = TileSequencerFSM(start=start, m_tiles=m_tiles, ...)
 ```
 
-Both `mac` and `rx_fifo` hold a reference to the same `Signal` object, so when one writes `sig.val`, the other immediately reads the updated value — same as a shared wire.
+Both `csr` and `fsm` hold a reference to the same `Signal` object, so when one writes `sig.val`, the other immediately reads the updated value — same as a shared wire.
 
-For AXI-Stream buses (which appear on the FIFO↔MAC interfaces), the three signals `tdata`, `tvalid`, and `tready` are bundled into a small class to reduce the number of arguments:
+For the ping-pong buffers, the active/shadow select is a single `Signal` driven by the FSM and read by both the buffer and the Systolic Data Setup:
 
 ```python
-class AXIStream:
-    tdata:  Signal
-    tvalid: Signal
-    tready: Signal
+ping_pong_sel = Signal()   # 0 = ping active, 1 = pong active
+
+weight_buf = WeightBuffer(sel=ping_pong_sel, ...)
+sds        = SystolicDataSetup(weight_sel=ping_pong_sel, ...)
+fsm        = TileSequencerFSM(ping_pong_sel=ping_pong_sel, ...)
 ```
 
 ## Clock model: the tick() loop
@@ -68,46 +69,36 @@ The top-level simulation loop calls `tick()` on every module in topological data
 
 ```python
 def tick(self):
-    self.mac.tick()
-    self.rx_fifo.tick()
-    self.parser.tick()
-    self.weight_bram.tick()
-    self.activation_bram.tick()
+    self.csr_block.tick()
+    self.tile_sequencer_fsm.tick()
+    self.xdma.tick()                    # injects next tile if fetch pending
+    self.weight_buffer.tick()
+    self.activation_buffer.tick()
     self.systolic_data_setup.tick()
     self.systolic_array.tick()
     self.accumulator_bank.tick()
-    self.output_bram.tick()
-    self.control_fsm.tick()
+    self.output_buffer.tick()
 ```
 
 Each `tick()` reads its input signals, computes new values, and writes its output signals. Because order follows the dataflow graph, a value written by an upstream module is visible to a downstream module within the same cycle, matching synchronous RTL behavior.
 
-The Control FSM is special: because it connects to all blocks (see block diagram), it naturally holds references to every module and can inspect or drive their signals directly.
+The Tile Sequencer FSM is special: because it connects to all blocks (see block diagram), it naturally holds references to every module and can inspect or drive their signals directly.
 
-## FIFO implementation: collections.deque
+## Ping-pong buffer implementation
 
-Both `RxFifo` and `TxFifo` use `collections.deque` as their internal buffer. This gives O(1) enqueue and dequeue, and we set an explicit depth to model the real FIFO capacity.
-
-The FIFO class exposes `full` and `empty` properties and drives `tvalid`/`tready` accordingly, matching the AXI-Stream handshake:
+Each ping-pong pair (Weight and Activation) is implemented as two 256-element byte arrays. The `sel` signal from the FSM selects which half is the *active* buffer (read by the SDS) and which is the *shadow* buffer (written by the XDMA stub during fetch). The FSM toggles `sel` at the start of each COMPUTE phase.
 
 ```python
-class RxFifo:
-    DEPTH = 512
+class WeightBuffer:
+    def __init__(self, sel, ...):
+        self._banks = [bytearray(256), bytearray(256)]
+        self._sel = sel   # Signal
 
-    def __init__(self, ...):
-        self._buf = deque()
+    @property
+    def active(self):
+        return self._banks[self._sel.val]
 
-    def full(self):
-        return len(self._buf) >= self.DEPTH
-
-    def empty(self):
-        return len(self._buf) == 0
-
-    def tick(self):
-        if self.in_valid.val and not self.full:
-            self._buf.append(self.in_data.val)
-        self.out_valid.val = not self.empty
-        if not self.empty and self.out_ready.val:
-            self.out_data.val = self._buf.popleft()
-        self.in_ready.val = not self.full
+    @property
+    def shadow(self):
+        return self._banks[1 - self._sel.val]
 ```
