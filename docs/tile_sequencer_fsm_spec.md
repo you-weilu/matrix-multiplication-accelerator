@@ -1,6 +1,6 @@
 # Tile Sequencer FSM Spec
 
-The Tile Sequencer FSM is the autonomous tiling loop controller. It replaces the original hardwired Control FSM. After the host writes matrix dimensions and base addresses to the CSR Block and asserts START, the FSM sequences the entire computation — fetching tiles from host RAM via XDMA, driving the compute pipeline, writing results back to host RAM — with no host CPU involvement between tiles. It asserts an interrupt when the full matrix multiply is complete.
+The Tile Sequencer FSM is the autonomous tiling loop controller. It replaces the original hardwired Control FSM. After the host writes matrix dimensions and base addresses to the CSR Block and asserts START, the FSM sequences the entire computation: fetching tiles from host RAM via XDMA, driving the compute pipeline, and writing results back to host RAM, with no host CPU involvement between tiles. It asserts an interrupt when the full matrix multiply is complete.
 
 The FSM connects to all blocks (XDMA command interface, Weight/Activation Buffers, Systolic Data Setup, Accumulator Bank, Output Buffer, CSR Block).
 
@@ -22,8 +22,8 @@ Triggers the Systolic Data Setup to run one tile pass (47 cycles: 16 pre-load + 
 
 ### COMPUTE_WAIT
 Waits for the tile pass to complete. Signals the Accumulator Bank:
-- If tk < K_TILES-1: **intermediate** — bank accumulates, holds result; transitions to FETCH_WAIT (or FETCH if next DMA was already issued)
-- If tk == K_TILES-1: **final** — bank accumulates and writes completed tile to Output Buffer, clears accumulators; transitions to WRITEBACK
+- If tk < K_TILES-1: **intermediate**: bank accumulates, holds result; transitions to FETCH_WAIT (or FETCH if next DMA was already issued)
+- If tk == K_TILES-1: **final**: bank accumulates and writes completed tile to Output Buffer, clears accumulators; transitions to WRITEBACK
 
 ### WRITEBACK
 Issues one AXI command to the XDMA engine to DMA the Output Buffer to the correct offset in host RAM for C[ti][tj]. Transitions to WRITEBACK_WAIT.

@@ -1,6 +1,6 @@
 # Data Flow Specification
 
-This document records top-level design decisions for the accelerator data flow. It is a living document — open decisions are marked TBD and will be filled in as the design matures.
+This document records top-level design decisions for the accelerator data flow. It is a living document; open decisions are marked TBD and will be filled in as the design matures.
 
 ---
 
@@ -8,7 +8,7 @@ This document records top-level design decisions for the accelerator data flow. 
 
 - INT8 matrix multiplication: C = A × B, where A is M×K and B is K×N, producing C as M×N INT32
 - The systolic array is fixed 16×16; arbitrary matrix sizes are supported by tiling
-- No hard upper bound on M, K, or N — the full matrices live in host RAM
+- No hard upper bound on M, K, or N; the full matrices live in host RAM
 - All dimensions must be multiples of 16. Non-multiples must be zero-padded by the host to the next multiple of 16. The host discards the corresponding padded rows/columns from the output.
 
 ---
@@ -89,7 +89,7 @@ C tile [ti][tj]: base = C_BASE_ADDR + (ti * 16 * N_full + tj * 16) * sizeof(int3
 
 where `K_full = K_TILES * 16` and `N_full = N_TILES * 16`.
 
-Each tile is 16 non-contiguous rows of 16 elements. The XDMA 2D transfer mode is used to fetch/write each tile without copying the full matrix row into a temporary buffer — TBD based on XDMA scatter-gather capability.
+Each tile is 16 non-contiguous rows of 16 elements. The XDMA 2D transfer mode is used to fetch/write each tile without copying the full matrix row into a temporary buffer (TBD based on XDMA scatter-gather capability).
 
 ---
 

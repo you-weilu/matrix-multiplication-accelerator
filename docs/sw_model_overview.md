@@ -51,7 +51,7 @@ csr     = CsrBlock(start=start, m_tiles=m_tiles, ...)
 fsm     = TileSequencerFSM(start=start, m_tiles=m_tiles, ...)
 ```
 
-Both `csr` and `fsm` hold a reference to the same `Signal` object, so when one writes `sig.val`, the other immediately reads the updated value — same as a shared wire.
+Both `csr` and `fsm` hold a reference to the same `Signal` object, so when one writes `sig.val`, the other immediately reads the updated value, the same as a shared wire.
 
 For the ping-pong buffers, the active/shadow select is a single `Signal` driven by the FSM and read by both the buffer and the Systolic Data Setup:
 

@@ -1,8 +1,8 @@
 # Matrix Multiplication Accelerator
 
-A fixed-function hardware accelerator for General Matrix Multiplication (GEMM — C = A × B), targeting the ALINX AX7103 FPGA board (Xilinx XC7A100T). Inspired by the Google TPU v1 architecture, it implements a 16×16 INT8 weight-stationary systolic array backed by a tile-streaming memory subsystem. The host communicates with the accelerator over PCIe Gen2 x4 via the Xilinx XDMA IP core, using a C++ API backed by a Linux PCIe kernel driver.
+A fixed-function hardware accelerator for General Matrix Multiplication (GEMM, C = A × B), targeting the ALINX AX7103 FPGA board (Xilinx XC7A100T). Inspired by the Google TPU v1 architecture, it implements a 16×16 INT8 weight-stationary systolic array backed by a tile-streaming memory subsystem. The host communicates with the accelerator over PCIe Gen2 x4 via the Xilinx XDMA IP core, using a C++ API backed by a Linux PCIe kernel driver.
 
-The full matrices live in host RAM. The on-chip design holds only two ping-pong tile buffers per operand (4 × 256 bytes) and a 1 KB output buffer. A Tile Sequencer FSM autonomously sequences the entire tiling loop — fetching tiles from host RAM via XDMA, driving the compute pipeline, and writing results back — with no host CPU involvement between tiles.
+The full matrices live in host RAM. The on-chip design holds only two ping-pong tile buffers per operand (4 × 256 bytes) and a 1 KB output buffer. A Tile Sequencer FSM autonomously sequences the entire tiling loop: fetching tiles from host RAM via XDMA, driving the compute pipeline, and writing results back, with no host CPU involvement between tiles.
 
 ## Block Diagram
 
@@ -16,7 +16,7 @@ Data flows from the host through the accelerator and back as follows:
 
 **Tile fetch (double-buffered):** The Tile Sequencer FSM commands XDMA via AXI to DMA each 16×16 weight tile and activation tile from host RAM into the on-chip ping-pong buffers. While the systolic array processes one tile pair, XDMA loads the next pair into the shadow buffers.
 
-**Compute path:** The Systolic Data Setup block reads from the active ping-pong buffers and skews the data correctly for systolic array ingestion. The 16×16 INT8 Systolic Array performs the matrix multiply — each PE computes one INT8 MAC per cycle, with partial sums propagating downward through each column into the Accumulator Bank.
+**Compute path:** The Systolic Data Setup block reads from the active ping-pong buffers and skews the data correctly for systolic array ingestion. The 16×16 INT8 Systolic Array performs the matrix multiply; each PE computes one INT8 MAC per cycle, with partial sums propagating downward through each column into the Accumulator Bank.
 
 **Result writeback:** After the final K-tile pass for each output tile, the Accumulator Bank writes the completed 16×16 INT32 tile into the Output Buffer. The Tile Sequencer FSM then commands XDMA to DMA the result back to the correct offset in host RAM. When all output tiles are done, the FSM asserts an interrupt to notify the host.
 

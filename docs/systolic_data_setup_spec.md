@@ -7,14 +7,14 @@ The Systolic Data Setup is a timing and sequencing controller that sits between 
 It contains a 256-byte internal working buffer that holds the current activation tile, copied directly from the active Activation Buffer during pre-load. This gives the SDS random access to any element of the tile, which is needed to feed columns of A into rows of the array with skewing.
 
 It operates in two phases per tile, triggered by the Tile Sequencer FSM:
-1. **Pre-load (16 cycles)** — weight loading and activation pre-load run in parallel
-2. **Activation feeding (31 cycles)** — skewed activation feeding from working buffer into array
+1. **Pre-load (16 cycles):** weight loading and activation pre-load run in parallel
+2. **Activation feeding (31 cycles):** skewed activation feeding from working buffer into array
 
 ---
 
 ## Phase 1a: Weight Loading (16 cycles)
 
-Weights are loaded by reading the active Weight Buffer and feeding values into the top of each array column. The columns act as shift register chains — values shift downward one PE per cycle.
+Weights are loaded by reading the active Weight Buffer and feeding values into the top of each array column. The columns act as shift register chains; values shift downward one PE per cycle.
 
 Rows are read in reverse order so that PE[i][j] ends up holding B[i][j]:
 
@@ -25,7 +25,7 @@ Rows are read in reverse order so that PE[i][j] ends up holding B[i][j]:
 | ...   | ...             | ...                            |
 | 15    | row 0           | B[0][j]                        |
 
-After 16 cycles all PEs hold their weights. All 16 columns load simultaneously — 16 values enter the array each cycle.
+After 16 cycles all PEs hold their weights. All 16 columns load simultaneously; 16 values enter the array each cycle.
 
 ---
 
@@ -45,7 +45,7 @@ After 16 cycles, `working_buffer[i][j] = A[i][j]` for all i, j. Phases 1a and 1b
 
 For computing C = A × B, array row k must receive column k of A: the sequence A[0][k], A[1][k], ..., A[15][k]. The SDS reads this from the working buffer by indexing across rows at column k.
 
-Rows are staggered by one cycle per row — row k starts k cycles after row 0. This diagonal skewing ensures each activation element meets the correct weight and in-flight partial sum at each PE.
+Rows are staggered by one cycle per row: row k starts k cycles after row 0. This diagonal skewing ensures each activation element meets the correct weight and in-flight partial sum at each PE.
 
 At cycle t (0-indexed from start of this phase), array row k receives:
 - `working_buffer[t-k][k] = A[t-k][k]` if t >= k, else 0
@@ -63,6 +63,6 @@ Total duration: 16 data cycles + 15 skew cycles = 31 cycles.
 
 ## Tiling
 
-For matrices larger than 16×16, the Tile Sequencer FSM drives the SDS through multiple tile passes. Before each pass, the FSM has already swapped the ping-pong buffers so the active Weight Buffer and Activation Buffer contain the correct tile. The SDS has no knowledge of which tile it is processing — it always reads from whichever buffer is currently active. The working buffer is overwritten each tile pass.
+For matrices larger than 16×16, the Tile Sequencer FSM drives the SDS through multiple tile passes. Before each pass, the FSM has already swapped the ping-pong buffers so the active Weight Buffer and Activation Buffer contain the correct tile. The SDS has no knowledge of which tile it is processing; it always reads from whichever buffer is currently active. The working buffer is overwritten each tile pass.
 
 Total cycles per tile pass: 16 (pre-load) + 31 (feeding) = 47 cycles. The partial sum drain overlaps with the tail of feeding.

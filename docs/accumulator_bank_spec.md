@@ -8,7 +8,7 @@ The Accumulator Bank collects partial sums flowing out of the bottom of the syst
 
 16 accumulators, one per array column. Each holds a 32-bit value to prevent overflow.
 
-Worst case: large K dimension, up to K_TILES tile passes. Each tile contributes partial sums of 16 INT8×INT8 products. Maximum single-PE product = 127×127 = 16,129 (fits in 15 bits). Maximum accumulator value = 16,129 × 16 PEs × K_TILES passes — 32-bit accumulators provide ample headroom for any practical K.
+Worst case: large K dimension, up to K_TILES tile passes. Each tile contributes partial sums of 16 INT8×INT8 products. Maximum single-PE product = 127×127 = 16,129 (fits in 15 bits). Maximum accumulator value = 16,129 × 16 PEs × K_TILES passes; 32-bit accumulators provide ample headroom for any practical K.
 
 ---
 
@@ -23,4 +23,4 @@ The Tile Sequencer FSM signals whether each tile pass is an intermediate accumul
 
 The Output Buffer is a 1 KB register buffer (16×16 × INT32). After the Accumulator Bank writes a completed tile into it, the Tile Sequencer FSM commands XDMA to DMA it back to the correct offset in host RAM.
 
-Since we have a weight-stationary systolic array, there is no separate drain phase — partial sums exit the array naturally as activations flow through.
+Since we have a weight-stationary systolic array, there is no separate drain phase; partial sums exit the array naturally as activations flow through.

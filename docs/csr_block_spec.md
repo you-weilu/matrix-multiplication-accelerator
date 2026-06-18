@@ -46,7 +46,7 @@ All registers are 32-bit wide and 4-byte aligned on the AXI-Lite address space.
 
 ### Write sequencing
 
-The host must write all dimension and address registers before writing CONTROL=1. There is no hardware enforcement of ordering — the host software is responsible.
+The host must write all dimension and address registers before writing CONTROL=1. There is no hardware enforcement of ordering; the host software is responsible.
 
 ### START pulse
 
