@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1782729828" />
+    <testcase name="test_reset" classname="test_systolic_array" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/systolic_array/test_systolic_array.py" lineno="41" time="0.0012407302856445312" sim_time_ns="20.0" ratio_time="16119.538816295157" />
+    <testcase name="test_all_ones" classname="test_systolic_array" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/systolic_array/test_systolic_array.py" lineno="50" time="0.00501704216003418" sim_time_ns="350.0" ratio_time="69762.2202157487" />
+    <testcase name="test_sw_model" classname="test_systolic_array" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/systolic_array/test_systolic_array.py" lineno="76" time="0.008946895599365234" sim_time_ns="499.99999999999994" ratio_time="55885.30618770985" />
+  </testsuite>
+</testsuites>

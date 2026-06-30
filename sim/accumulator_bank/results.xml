@@ -1,0 +1,10 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1782819724" />
+    <testcase name="test_reset" classname="test_accumulator_bank" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/accumulator_bank/test_accumulator_bank.py" lineno="34" time="0.0007009506225585938" sim_time_ns="20.0" ratio_time="28532.680272108842" />
+    <testcase name="test_no_write_intermediate_pass" classname="test_accumulator_bank" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/accumulator_bank/test_accumulator_bank.py" lineno="43" time="0.0018391609191894531" sim_time_ns="220.0" ratio_time="119619.76665802437" />
+    <testcase name="test_single_tile_writeback" classname="test_accumulator_bank" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/accumulator_bank/test_accumulator_bank.py" lineno="58" time="0.0032880306243896484" sim_time_ns="359.99999999999994" ratio_time="109488.03132477701" />
+    <testcase name="test_accumulation_across_passes" classname="test_accumulator_bank" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/accumulator_bank/test_accumulator_bank.py" lineno="85" time="0.004440784454345703" sim_time_ns="509.9999999999999" ratio_time="114844.5742510469" />
+    <testcase name="test_accumulators_clear_after_tile" classname="test_accumulator_bank" file="/Users/terrylu/Documents/Digital Design/matrix-multiplication-accelerator/sim/accumulator_bank/test_accumulator_bank.py" lineno="110" time="0.004974842071533203" sim_time_ns="700.0" ratio_time="140707.98428064794" />
+  </testsuite>
+</testsuites>
