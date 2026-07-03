@@ -1,0 +1,4 @@
+define XMSIMRC	( /vol/cadence2018/XCELIUM1809/tools/xcelium/files/xmsimrc, ~/.xmsimrc )
+include ./hdlrun.var
+DEFINE RUNMODEDEFAULT 1
+DEFINE LIB_MAP ( + => worklib )

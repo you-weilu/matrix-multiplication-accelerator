@@ -1,0 +1,12 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
+-64bit
+-gui
+-access
++rwc
+-sv
+../../rtl/src/systolic_data_setup.sv
+-top
+systolic_data_setup
