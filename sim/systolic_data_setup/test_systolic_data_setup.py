@@ -138,6 +138,8 @@ async def test_weight_addr_sequence(dut):
         await RisingEdge(dut.clk)
 
 
+"""DEBUG THIS TEST"""
+
 @cocotb.test()
 async def test_act_in_skew(dut):
     """act_in is skewed: row k starts k cycles into FEED, all others are 0 before that."""
@@ -164,12 +166,11 @@ async def test_act_in_skew(dut):
     # FEED: check skewing — at cycle t, row k should get act_tile[t-k][k] if t>=k else 0
     for t in range(31):
         await RisingEdge(dut.clk)
-        print(f"t={t}  hw_cycle={int(dut.cycle.value)}  hw_state={int(dut.state.value)}  act_in0={int(dut.act_in[0].value)}")
         for k in range(N):
             result = int(dut.act_in[k].value)
             if t >= k and (t - k) < N:
                 expected = act_tile[t - k][k] & 0xFF
             else:
                 expected = 0
-            # assert result == expected, \
-            #     f"FEED cycle {t} row {k}: expected act_in={expected}, got {result}"
+            assert result == expected, \
+                f"FEED cycle {t} row {k}: expected act_in={expected}, got {result}"

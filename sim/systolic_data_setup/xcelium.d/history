@@ -1,6 +1,0 @@
-//
-// File created by:  xrun
-// Do not modify this file
-
-s1::(02Jul2026:22:49:47):( xrun -64bit -gui -access +rwc -sv ../../rtl/src/systolic_data_setup.sv -top systolic_data_setup )
-s2::(02Jul2026:22:51:00):( xrun -64bit -gui -access +rwc -sverilog ../../rtl/src/systolic_data_setup.sv -top systolic_data_setup )
