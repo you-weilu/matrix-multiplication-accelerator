@@ -101,8 +101,8 @@ module pingpong_buffers (
                         weight_row <= 0;
                         weight_state <= BURST;
                     end
-                    
                 end
+                
                 BURST: begin // accepts data one beat (16 bytes) per cycle into non_active buffer
                     fill_weight_axi.wready <= 1;
                     if (fill_weight_axi.wvalid) begin

@@ -1,4 +1,4 @@
-// Tile Sequencer FSM
+// Tile Sequencer
 //
 // Top-level control FSM for the matrix multiplication accelerator. Iterates
 // over all output tiles of C = A x B, orchestrating the ping-pong buffers,
