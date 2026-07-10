@@ -148,6 +148,7 @@ module csr_block (
                     3'h1: reg_m_tiles <= wr_data_lat[7:0];
                     3'h2: reg_n_tiles <= wr_data_lat[7:0];
                     3'h3: reg_k_tiles <= wr_data_lat[7:0];
+                    default: ;  // STATUS (0x10) and unmapped addresses are RO
                 endcase
             end
         end

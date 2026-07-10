@@ -1,6 +1,6 @@
-SIM           = icarus
+SIM           = verilator
 TOPLEVEL_LANG = verilog
-COMPILE_ARGS  = -g2012
+EXTRA_ARGS   += --timing --trace
 
 VERILOG_SOURCES = ../../rtl/src/systolic_data_setup.sv
 TOPLEVEL        = systolic_data_setup

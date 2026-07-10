@@ -155,17 +155,19 @@ async def test_act_in_skew(dut):
     dut.start.value = 0
 
     # PRELOAD: serve buffer data as SDS requests it
-    for _ in range(N):
-        w_addr = int(dut.weight_buf_addr.value)
-        a_addr = int(dut.act_buf_addr.value)
+    for i in range(N):
+        w_addr = int(dut.weight_buf_addr.value) # read w_addr sds is requesting
+        a_addr = int(dut.act_buf_addr.value) # ready a_addr sds is requesting
         for j in range(N):
             dut.weight_buf_data[j].value = weight_tile[w_addr][j] & 0xFF
             dut.act_buf_data[j].value    = act_tile[a_addr][j]    & 0xFF
         await RisingEdge(dut.clk)
+        await FallingEdge(dut.clk)
 
-    # FEED: check skewing — at cycle t, row k should get act_tile[t-k][k] if t>=k else 0
+    # FEED: check skewing --> at cycle t, row k should get act_tile[t-k][k] if t>=k else 0
     for t in range(31):
         await RisingEdge(dut.clk)
+        await FallingEdge(dut.clk)   # let act_in's NBA update settle
         for k in range(N):
             result = int(dut.act_in[k].value)
             if t >= k and (t - k) < N:

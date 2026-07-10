@@ -44,7 +44,6 @@ module systolic_data_setup (
         weight_buf_addr = (state == PRELOAD) ? 4'(15 - cycle) : 4'b0;
         act_buf_addr    = (state == PRELOAD) ? cycle[3:0]     : 4'b0;
         row_valid       = (state == FEED) && (cycle >= 15);
-
     end
 
     always_ff @(posedge clk) begin
@@ -75,7 +74,7 @@ module systolic_data_setup (
                     weight_load_en <= 1;
                     for (int j = 0; j < 16; j++) begin
                         weight_in[j]       <= weight_buf_data[j];
-                        buf_work[cycle][j] <= act_buf_data[j];
+                        buf_work[cycle[3:0]][j] <= act_buf_data[j];
                     end
                     if (cycle == 15) begin
                         state <= FEED;
@@ -89,8 +88,8 @@ module systolic_data_setup (
 
                 FEED: begin // on cycle t, row k needs buf_work[t-k][k] if t >= k
                     for (int k = 0; k < 16; k++) begin
-                        if (cycle >= k && (cycle - k) < 16)
-                            act_in[k] <= buf_work[cycle - k][k]; // skew + transpose
+                        if (cycle >= 5'(k) && (cycle - 5'(k)) < 5'd16)
+                            act_in[k] <= buf_work[4'(cycle - 5'(k))][k]; // skew + transpose
                         else
                             act_in[k] <= 0;
                     end
