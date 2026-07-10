@@ -6,7 +6,7 @@ The full matrices live in host RAM. The on-chip design holds only two ping-pong 
 
 ## Block Diagram
 
-![Block Diagram](https://raw.githubusercontent.com/you-weilu/matrix-multiplication-accelerator/main/docs/block_diagram.png)
+![Block Diagram](https://raw.githubusercontent.com/you-weilu/matrix-multiplication-accelerator/main/docs/blockdiagrampng.png)
 
 ## Architecture
 
