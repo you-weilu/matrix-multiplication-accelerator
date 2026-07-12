@@ -1,3 +1,8 @@
+"""
+changes to make: add a DMA controller module that computes source address
+of matrixies, and writes to XDMA's control registers to program each new
+descriptor. Need to add base adddress to CSR.
+"""
 // CSR Block (Control and Status Registers)
 //
 // AXI4-Lite slave register file. Software (host CPU) writes matrix dimensions
