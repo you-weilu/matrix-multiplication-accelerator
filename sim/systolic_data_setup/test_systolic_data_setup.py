@@ -49,14 +49,14 @@ async def test_reset(dut):
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
     await reset(dut)
     await RisingEdge(dut.clk)
-    assert int(dut.done.value)          == 0
+    assert int(dut.pass_done.value)          == 0
     assert int(dut.weight_load_en.value) == 0
     assert int(dut.row_valid.value)      == 0
 
 
 @cocotb.test()
 async def test_done_pulses(dut):
-    """done pulses exactly once at the end of the tile pass."""
+    """pass_done pulses exactly once at the end of the tile pass."""
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
     await reset(dut)
 
@@ -64,9 +64,9 @@ async def test_done_pulses(dut):
     act_tile    = [[1] * N for _ in range(N)]
     await run_tile_pass(dut, weight_tile, act_tile)
 
-    assert int(dut.done.value) == 1, "done should pulse at end of tile pass"
+    assert int(dut.pass_done.value) == 1, "done should pulse at end of tile pass"
     await RisingEdge(dut.clk)
-    assert int(dut.done.value) == 0, "done should only pulse one cycle"
+    assert int(dut.pass_done.value) == 0, "done should only pulse one cycle"
 
 
 @cocotb.test()

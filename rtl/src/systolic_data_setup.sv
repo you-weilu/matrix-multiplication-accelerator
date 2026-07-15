@@ -16,7 +16,7 @@ module systolic_data_setup (
 
     // FSM control
     input  logic        start, // pulse to begin a tile pass
-    output logic        done,  // pulses one cycle when tile pass completes
+    output logic        pass_done,  // pulses one cycle when tile pass completes
 
     // Weight buffer read port (one row of 16 bytes per cycle)
     output logic [3:0]  weight_buf_addr,
@@ -50,7 +50,7 @@ module systolic_data_setup (
         if (!rst_n) begin
             state          <= IDLE;
             cycle          <= 0;
-            done           <= 0;
+            pass_done      <= 0;
             weight_load_en <= 0;
             for (int i = 0; i < 16; i++) begin
                 weight_in[i] <= 0;
@@ -59,7 +59,7 @@ module systolic_data_setup (
                     buf_work[i][j] <= 0;
             end
         end else begin
-            done           <= 0;
+            pass_done      <= 0;
             weight_load_en <= 0;
 
             case (state)
@@ -96,7 +96,7 @@ module systolic_data_setup (
 
                     if (cycle == 30) begin
                         state <= IDLE;
-                        done <= 1;
+                        pass_done <= 1;
                         cycle <= 0;
                     end else begin
                         cycle <= cycle + 1;

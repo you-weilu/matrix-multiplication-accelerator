@@ -10,20 +10,27 @@
 // inner over K-tile passes.
 //
 // CSR inputs (from csr_block):
-//   go        — software writes 1 to start; FSM clears it on completion
-//   M, N, K   — matrix dimensions in tiles (each tile = 16 elements)
+//   go                          — software writes 1 to start; FSM clears it on completion
+//   m_tiles, n_tiles, k_tiles   — matrix dimensions in tiles (each tile = 16 elements)
 //
 // Per-tile pass sequence:
-//   IDLE       — wait for go from CSR block
-//   FILL_WAIT  — wait for fill_weight_done and fill_act_done from ping-pong buffers
-//                (first pass: buffers already filled before go; subsequent passes:
-//                 new tile loaded during previous compute)
-//   SWAP       — pulse swap to ping-pong buffers; buffers exchange active/inactive
-//   COMPUTE    — pulse start to SDS; wait for done
-//   ACCUM_WAIT — wait for tile_done from accumulator bank (writeback to output buffer)
-//   ADVANCE    — increment K tile index; if more K passes remain, trigger next fill
-//                and loop back to FILL_WAIT; else advance output tile indices,
-//                check if all output tiles done, go back to IDLE or next tile
+//   IDLE           — wait for go from CSR block
+//   FILL_WAIT      — wait for fill_weight_done and fill_act_done from ping-pong buffers;
+//                    these are sticky level signals (not pulses) — they latch high on fill
+//                    completion and clear only when swap fires, so they are safe to check
+//                    even if fill completes while FSM is in WRITEBACK_WAIT
+//   SWAP           — pulse swap to ping-pong buffers; clears sticky fill signals
+//   COMPUTE_START  — pulse start to SDS for one cycle; latch final_pass if last K pass
+//   COMPUTE        — wait for pass_done from SDS;
+//                    if final_pass: go to ACCUM_WAIT
+//                    else: increment k_tile, pulse fill_start, go to FILL_WAIT
+//   ACCUM_WAIT     — wait for tile_done from accumulator bank; clear final_pass; go to ADVANCE
+//   ADVANCE        — reset k_tile; pulse writeback_start; advance tile_j then tile_i;
+//                    for intermediate tiles: pulse fill_start, set last_tile=0, go to WRITEBACK_WAIT
+//                    for final tile: set last_tile=1, go to WRITEBACK_WAIT
+//   WRITEBACK_WAIT — wait for writeback_done from DMA controller;
+//                    if last_tile: pulse ts_done, go to IDLE
+//                    else: pulse fill_start, go to FILL_WAIT (fill may already be in progress)
 //
 // Outputs:
 //   swap            — pulse to ping-pong buffers
@@ -32,9 +39,13 @@
 //                     signals accumulator bank to writeback on this pass
 //   ts_done         — pulses when entire matrix multiply is complete (to CSR)
 //   ts_busy         — held high while FSM is running (to CSR)
-//   tile_i, tile_j  — current output tile coordinates (for output buffer addressing)
-//   k_tile          — current K-tile index (for AXI4 DMA address generation)
+//   tile_i, tile_j  — current OUTPUT tile coordinates (for output buffer addressing)
+//   k_tile          — current K-tile index (for AXI4 DMA fetching address generation)
 //   fill_start      — pulse to trigger DMA fetch of next tile pair (uses tile_i/tile_j/k_tile)
+//   writeback_start — pulse to trigger DMA C2H writeback of completed output tile to host RAM
+//
+// Inputs:
+//   writeback_done  — pulsed by DMA controller when C2H writeback completes
 
 module tile_sequencer_fsm (
     input  logic        clk, rst_n,
@@ -52,7 +63,7 @@ module tile_sequencer_fsm (
 
     // SDS control
     output logic        start,
-    input  logic        sds_done,
+    input  logic        pass_done,
 
     // Accumulator bank control
     output logic        final_pass,
@@ -62,17 +73,21 @@ module tile_sequencer_fsm (
     output logic        ts_busy,
     output logic        ts_done,
 
-    // Tile indices
+    // Tile indices / counters
     output logic [7:0]  tile_i,
     output logic [7:0]  tile_j,
     output logic [7:0]  k_tile,
 
-    // DMA fill trigger
-    output logic        fill_start
+    // DMA triggers
+    output logic        fill_start,
+    output logic        writeback_start,
+    input  logic        writeback_done
 );
 
-    typedef enum logic [2:0] { IDLE, FILL_WAIT, SWAP, COMPUTE, ACCUM_WAIT, ADVANCE } state_t;
+    typedef enum logic [3:0] { IDLE, FILL_WAIT, SWAP, COMPUTE_START, COMPUTE, ACCUM_WAIT, ADVANCE, WRITEBACK_WAIT } state_t;
     state_t state;
+
+    logic last_tile;
 
     // Main FSM Logic
     always_ff @(posedge clk) begin
@@ -84,18 +99,20 @@ module tile_sequencer_fsm (
             final_pass <= 0;
             ts_busy    <= 0;
             ts_done    <= 0;
-            fill_start <= 0;
-            tile_i     <= 0;
-            tile_j     <= 0;
-            k_tile     <= 0;
+            fill_start      <= 0;
+            writeback_start <= 0;
+            tile_i          <= 0;
+            tile_j          <= 0;
+            k_tile          <= 0;
+            last_tile       <= 0;
 
         end else begin
             // default: clear all pulse outputs each cycle
-            swap       <= 0;
-            start      <= 0;
-            final_pass <= 0;
-            ts_done    <= 0;
-            fill_start <= 0;
+            swap            <= 0;
+            start           <= 0;
+            ts_done         <= 0;
+            fill_start      <= 0;
+            writeback_start <= 0;
 
             case (state)
                 IDLE: begin
@@ -113,6 +130,72 @@ module tile_sequencer_fsm (
                 FILL_WAIT: begin
                     if (fill_weight_done && fill_act_done) begin
                         state <= SWAP;
+                    end
+                end
+
+                SWAP: begin
+                    swap  <= 1;
+                    state <= COMPUTE_START;
+                end
+
+                COMPUTE_START: begin
+                    start      <= 1;
+                    state      <= COMPUTE;
+                    final_pass <= (k_tile == k_tiles - 1);
+                end
+
+                COMPUTE: begin
+                    if (pass_done) begin
+                        if (final_pass)
+                            state <= ACCUM_WAIT;
+                        else begin
+                            // fill next K pass
+                            k_tile     <= k_tile + 1;
+                            fill_start <= 1;
+                            state      <= FILL_WAIT;
+                        end
+                    end
+                end
+
+                ACCUM_WAIT: begin
+                    if (tile_done) begin
+                        final_pass <= 0;
+                        state      <= ADVANCE;
+                    end
+                end
+
+                ADVANCE: begin
+                    k_tile          <= 0;
+                    writeback_start <= 1;
+                    if (tile_j == n_tiles - 1) begin
+                        tile_j <= 0;
+                        if (tile_i == m_tiles - 1) begin
+                            // all output tiles done —-> wait for final writeback
+                            last_tile <= 1;
+                            state     <= WRITEBACK_WAIT;
+                        end else begin
+                            last_tile  <= 0;
+                            tile_i     <= tile_i + 1;
+                            fill_start <= 1;
+                            state      <= WRITEBACK_WAIT;
+                        end
+                    end else begin
+                        last_tile  <= 0;
+                        tile_j     <= tile_j + 1;
+                        fill_start <= 1;
+                        state      <= WRITEBACK_WAIT;
+                    end
+                end
+
+                WRITEBACK_WAIT: begin
+                    if (writeback_done) begin
+                        if (last_tile) begin
+                            ts_done <= 1;
+                            ts_busy <= 0;
+                            state   <= IDLE;
+                        end else
+                            // do not wait for writeback_done for intermediate passes
+                            state <= FILL_WAIT;
                     end
                 end
 

@@ -8,14 +8,16 @@
 // total: ping_weight, pong_weight, ping_act, pong_act. A single bit (active)
 // tracks which side the SDS reads from; the other side accepts AXI4 writes.
 //
-// On swap (pulsed by the Tile Sequencer FSM), the active bit flips. The FSM
-// must only assert swap after both fill_weight_done and fill_act_done are high,
-// and after the SDS has asserted done for the current tile pass.
+// On swap (pulsed by the Tile Sequencer FSM), the active bit flips. swap also
+// serves as the acknowledgement for fill_weight_done and fill_act_done, clearing
+// both sticky signals. The FSM must only assert swap after both are high.
 //
 // Fill side (AXI4 slave, write-only):
 //   AXI4 bursts of 16 beats x 128-bit (one full tile per burst). The fill
 //   controller accepts the burst and writes rows 0-15 into the inactive buffer.
-//   fill_weight_done / fill_act_done pulse when each burst completes.
+//   fill_weight_done / fill_act_done latch high when each burst completes and
+//   remain high until swap fires. This allows fill to complete while the FSM is
+//   in another state without losing the completion signal.
 //
 // Read side (SDS, read-only):
 //   Row-addressed read port: 4-bit addr selects a row, combinational 16-byte
@@ -89,8 +91,11 @@ module pingpong_buffers (
             fill_act_axi.wready     <= 0;
             fill_act_axi.bvalid     <= 0;
         end else begin
-            fill_weight_done <= 0;
-            fill_act_done    <= 0;
+            // clear fill_done signals when FSM acknowledges via swap
+            if (swap) begin
+                fill_weight_done <= 0;
+                fill_act_done    <= 0;
+            end
 
             // Weight FSM
             case (weight_state)
