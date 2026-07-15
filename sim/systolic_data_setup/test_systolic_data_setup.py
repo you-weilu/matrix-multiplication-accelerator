@@ -155,7 +155,7 @@ async def test_act_in_skew(dut):
     dut.start.value = 0
 
     # PRELOAD: serve buffer data as SDS requests it
-    for i in range(N):
+    for _ in range(N):
         w_addr = int(dut.weight_buf_addr.value) # read w_addr sds is requesting
         a_addr = int(dut.act_buf_addr.value) # ready a_addr sds is requesting
         for j in range(N):
