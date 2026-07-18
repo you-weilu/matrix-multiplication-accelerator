@@ -1,0 +1,11 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1784398177" />
+    <testcase name="test_reset" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="93" time="0.0003552436828613281" sim_time_ns="20.0" ratio_time="56299.38255033557" />
+    <testcase name="test_write_read_basic" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="101" time="0.0016200542449951172" sim_time_ns="840.0" ratio_time="518501.15673289186" />
+    <testcase name="test_write_read_signed" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="120" time="0.0016617774963378906" sim_time_ns="840.0" ratio_time="505482.8350071736" />
+    <testcase name="test_rlast_on_beat_63" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="139" time="0.0015759468078613281" sim_time_ns="840.0000000000002" ratio_time="533012.9137670199" />
+    <testcase name="test_rvalid_deasserts_after_burst" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="177" time="0.0013918876647949219" sim_time_ns="850.0" ratio_time="610681.4662555669" />
+    <testcase name="test_overwrite" classname="test_output_buffer" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/output_buffer/test_output_buffer.py" lineno="190" time="0.002009153366088867" sim_time_ns="1000.0" ratio_time="497722.0837783316" />
+  </testsuite>
+</testsuites>
