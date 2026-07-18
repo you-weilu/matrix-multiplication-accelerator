@@ -6,11 +6,11 @@
 //
 // Register map (each 32-bit, word-addressed):
 //   0x00  CTRL          — bit[0]: go (W1S: write 1 to start; auto-clears when FSM done)
-//                         bit[1]: busy (RO: 1 while FSM is running)
-//   0x04  M_TILES       — number of output tile rows    (M / 16, max 255)
-//   0x08  N_TILES       — number of output tile columns (N / 16, max 255)
-//   0x0C  K_TILES       — number of K-tile passes       (K / 16, max 255)
-//   0x10  STATUS        — bit[0]: done (RO: pulses when multiply completes; cleared on next go)
+//                          bit[1]: busy (RO: 1 while FSM is running)
+//   0x04  M_TILES        — number of output tile rows    (M / 16, max 255)
+//   0x08  N_TILES        — number of output tile columns (N / 16, max 255)
+//   0x0C  K_TILES        — number of K-tile passes       (K / 16, max 255)
+//   0x10  STATUS         — bit[0]: done (RO: pulses when multiply completes; cleared on next go)
 //   0x14  BASE_ADDR_A_LO — bits[31:0]  of matrix A base address in host RAM
 //   0x18  BASE_ADDR_A_HI — bits[63:32] of matrix A base address in host RAM
 //   0x1C  BASE_ADDR_B_LO — bits[31:0]  of matrix B base address in host RAM

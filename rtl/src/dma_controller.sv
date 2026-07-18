@@ -45,6 +45,10 @@ module dma_controller (
     input  logic [7:0]  k_tiles,
     input  logic [7:0]  n_tiles,
 
+    // Card-side AXI base addresses of ping-pong buffer slave ports (fixed in address map)
+    input  logic [63:0] pp_weight_axi_base,
+    input  logic [63:0] pp_act_axi_base,
+
     // Completion signal to FSM (fill_weight_done/fill_act_done come from ping-pong buffers)
     output logic        writeback_done,
 
@@ -80,6 +84,77 @@ module dma_controller (
     input  logic [7:0]  h2c_sts_1,
     input  logic [7:0]  c2h_sts_0
 );
+    // State declarations
+    typedef enum logic [1:0] { IDLE, PUSH, WAIT_DONE } state_t;
+    state_t w_state, a_state;
+
+    // Address computations
+    always_comb begin
+        // H2C ch0: weight tile (matrix B)
+        h2c_dsc_byp_src_addr_0 = base_addr_b + (64'(tile_j) * 64'(k_tiles) + 64'(k_tile)) << 8;
+        h2c_dsc_byp_dst_addr_0 = pp_weight_axi_base;
+        h2c_dsc_byp_len_0      = 28'd256;
+        h2c_dsc_byp_ctl_0      = 16'h0003;
+        // H2C ch1: activation tile (matrix A)
+        h2c_dsc_byp_src_addr_1 = base_addr_a + (64'(tile_i) * 64'(k_tiles) + 64'(k_tile)) << 8;
+        h2c_dsc_byp_dst_addr_1 = pp_act_axi_base;
+        h2c_dsc_byp_len_1      = 28'd256;
+        h2c_dsc_byp_ctl_1      = 16'h0003;
+        // C2H ch0: output tile (matrix C)
+        c2h_dsc_byp_src_addr_0 = base_addr_c + 
+        c2h_dsc_byp_dst_addr_0 =
+        c2h_dsc_byp_len_0      =
+        c2h_dsc_byp_ctl_0      =
+
+    end
+
+    // H2C ch0 (WEIGHT) FSM
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            w_state            <= IDLE;
+            h2c_dsc_byp_load_0 <= 0;
+        end else begin
+            h2c_dsc_byp_load_0 <= 0;  // default deasserted
+            case (w_state)
+                IDLE: begin
+                    if (fill_start) w_state <= PUSH;
+                end
+                PUSH: begin
+                    if (h2c_dsc_byp_ready_0) begin
+                        h2c_dsc_byp_load_0 <= 1;
+                        w_state <= WAIT_DONE;
+                    end
+                end
+                WAIT_DONE: begin
+                    if (h2c_sts_0[3]) w_state <= IDLE;
+                end
+            endcase
+        end
+    end
+
+    // H2C ch1 (ACTIVATION) FSM
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            a_state            <= IDLE;
+            h2c_dsc_byp_load_1 <= 0;
+        end else begin
+            h2c_dsc_byp_load_1 <= 0;  // default deasserted
+            case (a_state)
+                IDLE: begin
+                    if (fill_start) a_state <= PUSH;
+                end
+                PUSH: begin
+                    if (h2c_dsc_byp_ready_1) begin
+                        h2c_dsc_byp_load_1 <= 1;
+                        a_state <= WAIT_DONE;
+                    end
+                end
+                WAIT_DONE: begin
+                    if (h2c_sts_1[3]) a_state <= IDLE;
+                end
+            endcase
+        end
+    end
 
     
 
