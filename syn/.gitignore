@@ -1,8 +1,11 @@
 reports/
 results/
 logs/
+scripts/rev_1/
 *.srr
 *.vm
 *.vhd
 *.edf
 *.srs
+*.srf
+*.srm

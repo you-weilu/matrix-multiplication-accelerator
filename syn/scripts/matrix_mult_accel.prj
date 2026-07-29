@@ -1,50 +1,75 @@
-# Synplify Pro project file — matrix multiplication accelerator
-# Run from syn/scripts/: synplify_pro -batch matrix_mult_accel.prj
+#--  Synopsys, Inc.
+#--  Synplify Pro
+#--  matrix multiplication accelerator
 
-# -------------------------------------------------------------------
-# Device (update for your target technology)
-# -------------------------------------------------------------------
+#project files
+add_file -constraint "../constraints/matrix_mult_accel.sdc"
+add_file -verilog -vlog_std sysv "../../rtl/src/pe.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/systolic_array.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/systolic_data_setup.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/accumulator_bank.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/pingpong_buffers.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/output_buffer.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/tile_sequencer_fsm.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/dma_controller.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/csr_block.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/axi4_if.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/axi_lite_if.sv"
+add_file -verilog -vlog_std sysv "../../rtl/src/top.sv"
+
+#implementation: "rev_1"
+impl -add rev_1 -type fpga
+
+#implementation attributes
+set_option -vlog_std sysv
+set_option -project_relative_includes 1
+
+#device options
 set_option -technology  VIRTEX7
 set_option -part        XC7V485T
 set_option -package     FFG1761
 set_option -speed_grade -2
+set_option -part_companion ""
 
-# -------------------------------------------------------------------
-# Source files
-# -------------------------------------------------------------------
-add_file -verilog "../../rtl/src/pe.sv"
-add_file -verilog "../../rtl/src/systolic_array.sv"
-add_file -verilog "../../rtl/src/systolic_data_setup.sv"
-add_file -verilog "../../rtl/src/accumulator_bank.sv"
-add_file -verilog "../../rtl/src/pingpong_buffers.sv"
-add_file -verilog "../../rtl/src/output_buffer.sv"
-add_file -verilog "../../rtl/src/tile_sequencer_fsm.sv"
-add_file -verilog "../../rtl/src/dma_controller.sv"
-add_file -verilog "../../rtl/src/csr_block.sv"
-add_file -verilog "../../rtl/src/axi4_if.sv"
-add_file -verilog "../../rtl/src/axi_lite_if.sv"
-add_file -verilog "../../rtl/src/top.sv"
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "top"
 
-# -------------------------------------------------------------------
-# Constraints
-# -------------------------------------------------------------------
-add_file -constraint "../constraints/matrix_mult_accel.sdc"
+# hdl_compiler_options
+set_option -distributed_compile 1
 
-# -------------------------------------------------------------------
-# Synthesis options
-# -------------------------------------------------------------------
-set_option -top_module              "top"
-set_option -frequency               200
-set_option -symbolic_fsm_compiler   true
-set_option -resource_sharing        true
-set_option -retiming                false
-set_option -pipe                    true
+# mapper_without_write_options
+set_option -frequency 200
+set_option -srs_instrumentation 1
 
-# -------------------------------------------------------------------
-# Output
-# -------------------------------------------------------------------
-project -result_format  "verilog"
-project -result_file    "../results/matrix_mult_accel.vm"
-project -log_file       "../logs/matrix_mult_accel.log"
+# mapper_options
+set_option -write_verilog 1
+set_option -write_vhdl 0
 
-impl -add impl -type fpga
+# Xilinx Virtex-7 options
+set_option -run_prop_extract 1
+set_option -maxfan 30
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+set_option -multi_file_compilation_unit 1
+set_option -auto_infer_blackbox 0
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "rev_1/top.vm"
+
+#design plan options
+impl -active "rev_1"
