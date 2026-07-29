@@ -111,11 +111,11 @@ module pingpong_buffers (
                 BURST: begin // accepts data one beat (16 bytes) per cycle into non_active buffer
                     fill_weight_axi.wready <= 1;
                     if (fill_weight_axi.wvalid) begin
-                        if (!active) begin //active: ping --> fill pong
-                            pong_weight[weight_row] <= fill_weight_axi.wdata;
-                        end
-                        else begin // active: pong --> fill ping
-                            ping_weight[weight_row] <= fill_weight_axi.wdata;
+                        for (int col = 0; col < 16; col++) begin
+                            if (!active) // active: ping --> fill pong
+                                pong_weight[weight_row][col] <= fill_weight_axi.wdata[col*8 +: 8];
+                            else         // active: pong --> fill ping
+                                ping_weight[weight_row][col] <= fill_weight_axi.wdata[col*8 +: 8];
                         end
                         weight_row <= weight_row + 1;
                         if (fill_weight_axi.wlast) begin
@@ -153,11 +153,11 @@ module pingpong_buffers (
                 BURST: begin // accepts data one beat (16 bytes) per cycle into non_active buffer
                     fill_act_axi.wready <= 1;
                     if (fill_act_axi.wvalid) begin
-                        if (!active) begin //active: ping --> fill pong
-                            pong_act[act_row] <= fill_act_axi.wdata;
-                        end
-                        else begin // active: pong --> fill ping
-                            ping_act[act_row] <= fill_act_axi.wdata;
+                        for (int col = 0; col < 16; col++) begin
+                            if (!active) // active: ping --> fill pong
+                                pong_act[act_row][col] <= fill_act_axi.wdata[col*8 +: 8]; // axi: [127:0] --> pong_weight: [7:0] [15:0]
+                            else         // active: pong --> fill ping
+                                ping_act[act_row][col] <= fill_act_axi.wdata[col*8 +: 8];
                         end
                         act_row <= act_row + 1;
                         if (fill_act_axi.wlast) begin

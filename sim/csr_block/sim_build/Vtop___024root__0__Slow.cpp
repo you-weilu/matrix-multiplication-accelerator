@@ -222,6 +222,9 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->csr_block_wrap__DOT__dut__DOT__k_tiles = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 11232590264419434309ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__ts_busy = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 6012113353897961107ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__ts_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 14002173693454510777ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__base_addr_a = VL_SCOPED_RAND_RESET_Q(64, __VscopeHash, 2339901506014861876ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__base_addr_b = VL_SCOPED_RAND_RESET_Q(64, __VscopeHash, 761057462971621884ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__base_addr_c = VL_SCOPED_RAND_RESET_Q(64, __VscopeHash, 11283456966298718445ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__clk = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 3851775996596419395ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__rst_n = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 12393769642992955104ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__reg_go = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 9348762095294752900ull);
@@ -229,7 +232,13 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->csr_block_wrap__DOT__dut__DOT__reg_n_tiles = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 10638839221180633725ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__reg_k_tiles = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 18012901135686842896ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__reg_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 16933063787719326498ull);
-    vlSelf->csr_block_wrap__DOT__dut__DOT__wr_addr_lat = VL_SCOPED_RAND_RESET_I(5, __VscopeHash, 7660819849893331587ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_a_lo = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 3901361138082641729ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_a_hi = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 15329019065105116502ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_b_lo = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 7958315380153885753ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_b_hi = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 2815475973407435543ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_c_lo = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 17334789049465989788ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__reg_base_addr_c_hi = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 652247589242528077ull);
+    vlSelf->csr_block_wrap__DOT__dut__DOT__wr_addr_lat = VL_SCOPED_RAND_RESET_I(6, __VscopeHash, 7660819849893331587ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__wr_data_lat = VL_SCOPED_RAND_RESET_I(32, __VscopeHash, 8068561618634152532ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__wr_commit = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 5484265708031143945ull);
     vlSelf->csr_block_wrap__DOT__dut__DOT__wr_state = VL_SCOPED_RAND_RESET_I(2, __VscopeHash, 6939929004242082284ull);

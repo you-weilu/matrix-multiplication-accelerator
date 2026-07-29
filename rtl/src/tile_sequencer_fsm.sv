@@ -81,7 +81,8 @@ module tile_sequencer_fsm (
     // DMA triggers
     output logic        fill_start,
     output logic        writeback_start,
-    input  logic        writeback_done
+    input  logic        writeback_done,
+    input  logic        init_done
 );
 
     typedef enum logic [3:0] { IDLE, FILL_WAIT, SWAP, COMPUTE_START, COMPUTE, ACCUM_WAIT, ADVANCE, WRITEBACK_WAIT } state_t;
@@ -117,7 +118,7 @@ module tile_sequencer_fsm (
             case (state)
                 IDLE: begin
                     ts_busy <= 0;
-                    if (go) begin
+                    if (go && init_done) begin
                         state      <= FILL_WAIT;
                         ts_busy    <= 1;
                         tile_i     <= 0;

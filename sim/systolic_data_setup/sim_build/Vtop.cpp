@@ -13,7 +13,7 @@ Vtop::Vtop(VerilatedContext* _vcontextp__, const char* _vcname__)
     , clk{vlSymsp->TOP.clk}
     , rst_n{vlSymsp->TOP.rst_n}
     , start{vlSymsp->TOP.start}
-    , done{vlSymsp->TOP.done}
+    , pass_done{vlSymsp->TOP.pass_done}
     , weight_buf_addr{vlSymsp->TOP.weight_buf_addr}
     , act_buf_addr{vlSymsp->TOP.act_buf_addr}
     , weight_load_en{vlSymsp->TOP.weight_load_en}

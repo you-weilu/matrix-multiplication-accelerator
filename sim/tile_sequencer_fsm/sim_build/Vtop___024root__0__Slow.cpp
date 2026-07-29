@@ -139,6 +139,8 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
                     vlSelfRef.writeback_start = vlSelfRef.tile_sequencer_fsm__DOT__writeback_start;
                     vlSelfRef.tile_sequencer_fsm__DOT__writeback_done 
                         = vlSelfRef.writeback_done;
+                    vlSelfRef.tile_sequencer_fsm__DOT__init_done 
+                        = vlSelfRef.init_done;
                 }
             }
         }
@@ -203,6 +205,7 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->fill_start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 12514334226953459133ull);
     vlSelf->writeback_start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 12070831044157274392ull);
     vlSelf->writeback_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 14023772087719021166ull);
+    vlSelf->init_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 13642578072536774985ull);
     vlSelf->tile_sequencer_fsm__DOT__clk = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 15830410430650925668ull);
     vlSelf->tile_sequencer_fsm__DOT__rst_n = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 10743160279904794605ull);
     vlSelf->tile_sequencer_fsm__DOT__go = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 14924180483321558705ull);
@@ -224,6 +227,7 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->tile_sequencer_fsm__DOT__fill_start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 11933314019871116349ull);
     vlSelf->tile_sequencer_fsm__DOT__writeback_start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 719917602546070537ull);
     vlSelf->tile_sequencer_fsm__DOT__writeback_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 12603507778198937705ull);
+    vlSelf->tile_sequencer_fsm__DOT__init_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 3426511018643966483ull);
     vlSelf->tile_sequencer_fsm__DOT__state = VL_SCOPED_RAND_RESET_I(4, __VscopeHash, 14672369296493934567ull);
     vlSelf->tile_sequencer_fsm__DOT__last_tile = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 1129317256036520629ull);
     for (int __Vi0 = 0; __Vi0 < 1; ++__Vi0) {

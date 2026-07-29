@@ -50,7 +50,7 @@ async def test_reset(dut):
 
 @cocotb.test()
 async def test_all_ones(dut):
-    """All weights=1, all activations=1. After 16 compute cycles col_out[j]=16."""
+    """All weights=1, all activations=1, checked lock-step against the sw model."""
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
     ref = SystolicArray()
     await reset(dut)

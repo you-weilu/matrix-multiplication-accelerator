@@ -1,0 +1,50 @@
+# Synplify Pro project file — matrix multiplication accelerator
+# Run from syn/scripts/: synplify_pro -batch matrix_mult_accel.prj
+
+# -------------------------------------------------------------------
+# Device (update for your target technology)
+# -------------------------------------------------------------------
+set_option -technology  VIRTEX7
+set_option -part        XC7V485T
+set_option -package     FFG1761
+set_option -speed_grade -2
+
+# -------------------------------------------------------------------
+# Source files
+# -------------------------------------------------------------------
+add_file -verilog "../../rtl/src/pe.sv"
+add_file -verilog "../../rtl/src/systolic_array.sv"
+add_file -verilog "../../rtl/src/systolic_data_setup.sv"
+add_file -verilog "../../rtl/src/accumulator_bank.sv"
+add_file -verilog "../../rtl/src/pingpong_buffers.sv"
+add_file -verilog "../../rtl/src/output_buffer.sv"
+add_file -verilog "../../rtl/src/tile_sequencer_fsm.sv"
+add_file -verilog "../../rtl/src/dma_controller.sv"
+add_file -verilog "../../rtl/src/csr_block.sv"
+add_file -verilog "../../rtl/src/axi4_if.sv"
+add_file -verilog "../../rtl/src/axi_lite_if.sv"
+add_file -verilog "../../rtl/src/top.sv"
+
+# -------------------------------------------------------------------
+# Constraints
+# -------------------------------------------------------------------
+add_file -constraint "../constraints/matrix_mult_accel.sdc"
+
+# -------------------------------------------------------------------
+# Synthesis options
+# -------------------------------------------------------------------
+set_option -top_module              "top"
+set_option -frequency               200
+set_option -symbolic_fsm_compiler   true
+set_option -resource_sharing        true
+set_option -retiming                false
+set_option -pipe                    true
+
+# -------------------------------------------------------------------
+# Output
+# -------------------------------------------------------------------
+project -result_format  "verilog"
+project -result_file    "../results/matrix_mult_accel.vm"
+project -log_file       "../logs/matrix_mult_accel.log"
+
+impl -add impl -type fpga

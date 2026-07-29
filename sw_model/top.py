@@ -54,9 +54,13 @@ class Top:
         self.fsm.tick()
         self.data_setup.tick()
 
-        # propagate systolic array bottom output to accumulator bank
+        # propagate systolic array bottom output to accumulator bank;
+        # aligned rows 0-14 drain during FEED cycles 31-45 (post-increment),
+        # row 15 lands on the cycle done pulses
+        ds = self.data_setup
         self._partial_in.val = list(self.array.col_out)
-        self._row_valid.val  = 1 if self.data_setup._state == 'FEED' else 0
+        self._row_valid.val  = 1 if ((ds._state == 'FEED' and ds._cycle >= 31)
+                                     or ds.done.val) else 0
 
         self.acc_bank.tick()
 

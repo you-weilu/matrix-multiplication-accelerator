@@ -30,7 +30,7 @@ void Vtop___024root__trace_chg_0_sub_0(Vtop___024root* vlSelf, VerilatedVcd::Buf
     bufp->chgBit(oldp+0,(vlSelfRef.clk));
     bufp->chgBit(oldp+1,(vlSelfRef.rst_n));
     bufp->chgBit(oldp+2,(vlSelfRef.start));
-    bufp->chgBit(oldp+3,(vlSelfRef.done));
+    bufp->chgBit(oldp+3,(vlSelfRef.pass_done));
     bufp->chgCData(oldp+4,(vlSelfRef.weight_buf_addr),4);
     Vtop___024root__trace_chg_dtype____0(vlSelf, bufp, 5, vlSelfRef.weight_buf_data);
     bufp->chgCData(oldp+21,(vlSelfRef.act_buf_addr),4);
@@ -72,7 +72,7 @@ void Vtop___024root__trace_chg_0_sub_0(Vtop___024root* vlSelf, VerilatedVcd::Buf
     bufp->chgBit(oldp+72,(vlSelfRef.systolic_data_setup__DOT__clk));
     bufp->chgBit(oldp+73,(vlSelfRef.systolic_data_setup__DOT__rst_n));
     bufp->chgBit(oldp+74,(vlSelfRef.systolic_data_setup__DOT__start));
-    bufp->chgBit(oldp+75,(vlSelfRef.systolic_data_setup__DOT__done));
+    bufp->chgBit(oldp+75,(vlSelfRef.systolic_data_setup__DOT__pass_done));
     bufp->chgCData(oldp+76,(vlSelfRef.systolic_data_setup__DOT__weight_buf_addr),4);
     bufp->chgCData(oldp+77,(vlSelfRef.systolic_data_setup__DOT__weight_buf_data[15]),8);
     bufp->chgCData(oldp+78,(vlSelfRef.systolic_data_setup__DOT__weight_buf_data[14]),8);
@@ -112,7 +112,7 @@ void Vtop___024root__trace_chg_0_sub_0(Vtop___024root* vlSelf, VerilatedVcd::Buf
     Vtop___024root__trace_chg_dtype____3(vlSelf, bufp, 127, vlSelfRef.systolic_data_setup__DOT__act_in);
     bufp->chgBit(oldp+143,(vlSelfRef.systolic_data_setup__DOT__row_valid));
     bufp->chgCData(oldp+144,(vlSelfRef.systolic_data_setup__DOT__state),2);
-    bufp->chgCData(oldp+145,(vlSelfRef.systolic_data_setup__DOT__cycle),5);
+    bufp->chgCData(oldp+145,(vlSelfRef.systolic_data_setup__DOT__cycle),6);
 }
 
 void Vtop___024root__trace_chg_dtype____0(Vtop___024root* vlSelf, VerilatedVcd::Buffer* bufp, uint32_t offset, const VlUnpacked<CData/*7:0*/, 16>& __VdtypeVar) {

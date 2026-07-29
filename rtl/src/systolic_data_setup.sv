@@ -38,12 +38,14 @@ module systolic_data_setup (
     state_t state;
 
     logic [7:0] buf_work [15:0][15:0];
-    logic [4:0] cycle;
+    logic [5:0] cycle;
 
+    // First deskewed result row reaches the accumulator during FEED cycle 32
+    // (act_in reg + 16 PE stages + 15 deskew stages), last during cycle 47.
     always_comb begin
         weight_buf_addr = (state == PRELOAD) ? 4'(15 - cycle) : 4'b0;
         act_buf_addr    = (state == PRELOAD) ? cycle[3:0]     : 4'b0;
-        row_valid       = (state == FEED) && (cycle >= 15);
+        row_valid       = (state == FEED) && (cycle >= 32);
     end
 
     always_ff @(posedge clk) begin
@@ -79,22 +81,21 @@ module systolic_data_setup (
                     if (cycle == 15) begin
                         state <= FEED;
                         cycle <= 0;
-                        for (int i = 0; i < 16; i++) begin
-                            weight_in[i] <= 0;
-                        end
                     end else
                         cycle <= cycle + 1;
                 end
 
                 FEED: begin // on cycle t, row k needs buf_work[t-k][k] if t >= k
                     for (int k = 0; k < 16; k++) begin
-                        if (cycle >= 5'(k) && (cycle - 5'(k)) < 5'd16)
-                            act_in[k] <= buf_work[4'(cycle - 5'(k))][k]; // skew + transpose
+                        if (cycle >= 6'(k) && (cycle - 6'(k)) < 6'd16)
+                            act_in[k] <= buf_work[4'(cycle - 6'(k))][k]; // skew + transpose
                         else
                             act_in[k] <= 0;
                     end
 
-                    if (cycle == 30) begin
+                    // feeding ends at cycle 30; stay in FEED until the array
+                    // and deskew pipes drain (last row captured at cycle 47)
+                    if (cycle == 47) begin
                         state <= IDLE;
                         pass_done <= 1;
                         cycle <= 0;

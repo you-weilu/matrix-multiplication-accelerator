@@ -82,9 +82,9 @@ VL_ATTR_COLD bool Vtop___024root___trigger_anySet__stl(const VlUnpacked<QData/*6
     return (0U);
 }
 
-extern const VlUnpacked<CData/*3:0*/, 128> Vtop__ConstPool__TABLE_h0e90d959_0;
-extern const VlUnpacked<CData/*3:0*/, 128> Vtop__ConstPool__TABLE_h423aee05_0;
-extern const VlUnpacked<CData/*0:0*/, 128> Vtop__ConstPool__TABLE_hebea6afc_0;
+extern const VlUnpacked<CData/*3:0*/, 256> Vtop__ConstPool__TABLE_hb6775339_0;
+extern const VlUnpacked<CData/*3:0*/, 256> Vtop__ConstPool__TABLE_h6fb57616_0;
+extern const VlUnpacked<CData/*0:0*/, 256> Vtop__ConstPool__TABLE_h53345b08_0;
 
 VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_phase__stl\n"); );
@@ -111,7 +111,7 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
             if ((1ULL & vlSelfRef.__VstlTriggered[0U])) {
                 {
                     // Inlined CFunc: _ico_sequent__TOP__0
-                    CData/*6:0*/ __Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0;
+                    CData/*7:0*/ __Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0;
                     __Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0 = 0;
                     vlSelfRef.systolic_data_setup__DOT__clk 
                         = vlSelfRef.clk;
@@ -119,7 +119,7 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
                         = vlSelfRef.rst_n;
                     vlSelfRef.systolic_data_setup__DOT__start 
                         = vlSelfRef.start;
-                    vlSelfRef.done = vlSelfRef.systolic_data_setup__DOT__done;
+                    vlSelfRef.pass_done = vlSelfRef.systolic_data_setup__DOT__pass_done;
                     vlSelfRef.systolic_data_setup__DOT__weight_buf_data 
                         = vlSelfRef.weight_buf_data;
                     vlSelfRef.systolic_data_setup__DOT__act_buf_data 
@@ -131,13 +131,13 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
                         = (((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
                             << 2U) | (IData)(vlSelfRef.systolic_data_setup__DOT__state));
                     vlSelfRef.systolic_data_setup__DOT__weight_buf_addr 
-                        = Vtop__ConstPool__TABLE_h0e90d959_0
+                        = Vtop__ConstPool__TABLE_hb6775339_0
                         [__Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.systolic_data_setup__DOT__act_buf_addr 
-                        = Vtop__ConstPool__TABLE_h423aee05_0
+                        = Vtop__ConstPool__TABLE_h6fb57616_0
                         [__Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.systolic_data_setup__DOT__row_valid 
-                        = Vtop__ConstPool__TABLE_hebea6afc_0
+                        = Vtop__ConstPool__TABLE_h53345b08_0
                         [__Vinline_0__eval_stl___Vinline_0__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.weight_buf_addr = vlSelfRef.systolic_data_setup__DOT__weight_buf_addr;
                     vlSelfRef.act_buf_addr = vlSelfRef.systolic_data_setup__DOT__act_buf_addr;
@@ -188,7 +188,7 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->clk = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 16707436170211756652ull);
     vlSelf->rst_n = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 1638864771569018232ull);
     vlSelf->start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 9867861323841650631ull);
-    vlSelf->done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 10296494685231209730ull);
+    vlSelf->pass_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 16196788924807663559ull);
     vlSelf->weight_buf_addr = VL_SCOPED_RAND_RESET_I(4, __VscopeHash, 17907573903570466642ull);
     for (int __Vi0 = 0; __Vi0 < 16; ++__Vi0) {
         vlSelf->weight_buf_data[__Vi0] = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 5627088129221737615ull);
@@ -208,7 +208,7 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->systolic_data_setup__DOT__clk = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 10557753968084902824ull);
     vlSelf->systolic_data_setup__DOT__rst_n = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 10702103558340015759ull);
     vlSelf->systolic_data_setup__DOT__start = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 2468149710586127753ull);
-    vlSelf->systolic_data_setup__DOT__done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 4003717566980664797ull);
+    vlSelf->systolic_data_setup__DOT__pass_done = VL_SCOPED_RAND_RESET_I(1, __VscopeHash, 18203439631247286734ull);
     vlSelf->systolic_data_setup__DOT__weight_buf_addr = VL_SCOPED_RAND_RESET_I(4, __VscopeHash, 10237650437481678390ull);
     for (int __Vi0 = 0; __Vi0 < 16; ++__Vi0) {
         vlSelf->systolic_data_setup__DOT__weight_buf_data[__Vi0] = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 15877239332104507473ull);
@@ -231,10 +231,9 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
             vlSelf->systolic_data_setup__DOT__buf_work[__Vi0][__Vi1] = VL_SCOPED_RAND_RESET_I(8, __VscopeHash, 291040785225510376ull);
         }
     }
-    vlSelf->systolic_data_setup__DOT__cycle = VL_SCOPED_RAND_RESET_I(5, __VscopeHash, 8828330567128977247ull);
+    vlSelf->systolic_data_setup__DOT__cycle = VL_SCOPED_RAND_RESET_I(6, __VscopeHash, 8828330567128977247ull);
     vlSelf->systolic_data_setup__DOT__unnamedblk3__DOT__j = 0;
-    vlSelf->systolic_data_setup__DOT__unnamedblk4__DOT__i = 0;
-    vlSelf->systolic_data_setup__DOT__unnamedblk5__DOT__k = 0;
+    vlSelf->systolic_data_setup__DOT__unnamedblk4__DOT__k = 0;
     vlSelf->systolic_data_setup__DOT__unnamedblk1__DOT__i = 0;
     vlSelf->systolic_data_setup__DOT__unnamedblk1__DOT__unnamedblk2__DOT__j = 0;
     for (int __Vi0 = 0; __Vi0 < 1; ++__Vi0) {

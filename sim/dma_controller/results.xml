@@ -1,0 +1,11 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1785336953" />
+    <testcase name="test_init_sequence" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="100" time="0.0013241767883300781" sim_time_ns="290.0" ratio_time="219003.9899171768" />
+    <testcase name="test_fill_descriptor_fields" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="125" time="0.0010297298431396484" sim_time_ns="330.0" ratio_time="320472.4056494559" />
+    <testcase name="test_writeback_descriptor_fields" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="196" time="0.000926971435546875" sim_time_ns="330.0" ratio_time="355998.02469135803" />
+    <testcase name="test_writeback_done_pulses" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="241" time="0.0009310245513916016" sim_time_ns="364.9999999999999" ratio_time="392041.2189500639" />
+    <testcase name="test_fill_waits_for_both_channels" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="273" time="0.0010380744934082031" sim_time_ns="370.0" ratio_time="356429.14101975196" />
+    <testcase name="test_back_to_back_fills" classname="test_dma_controller" file="/Users/terrylu/Documents/DigitalDesign/matrix-multiplication-accelerator/sim/dma_controller/test_dma_controller.py" lineno="311" time="0.0010759830474853516" sim_time_ns="420.0" ratio_time="390340.7223576335" />
+  </testsuite>
+</testsuites>

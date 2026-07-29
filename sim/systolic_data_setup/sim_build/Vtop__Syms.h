@@ -38,7 +38,6 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop__Syms final : public VerilatedSyms {
     VerilatedScope* __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2;
     VerilatedScope* __Vscopep_systolic_data_setup__unnamedblk3;
     VerilatedScope* __Vscopep_systolic_data_setup__unnamedblk4;
-    VerilatedScope* __Vscopep_systolic_data_setup__unnamedblk5;
 
     // SCOPE HIERARCHY
     VerilatedHierarchy __Vhier;

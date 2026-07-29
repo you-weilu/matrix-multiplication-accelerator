@@ -17,7 +17,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
     VL_IN8(clk,0,0);
     VL_IN8(rst_n,0,0);
     VL_IN8(start,0,0);
-    VL_OUT8(done,0,0);
+    VL_OUT8(pass_done,0,0);
     VL_OUT8(weight_buf_addr,3,0);
     VL_OUT8(act_buf_addr,3,0);
     VL_OUT8(weight_load_en,0,0);
@@ -25,13 +25,13 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
     CData/*0:0*/ systolic_data_setup__DOT__clk;
     CData/*0:0*/ systolic_data_setup__DOT__rst_n;
     CData/*0:0*/ systolic_data_setup__DOT__start;
-    CData/*0:0*/ systolic_data_setup__DOT__done;
+    CData/*0:0*/ systolic_data_setup__DOT__pass_done;
     CData/*3:0*/ systolic_data_setup__DOT__weight_buf_addr;
     CData/*3:0*/ systolic_data_setup__DOT__act_buf_addr;
     CData/*0:0*/ systolic_data_setup__DOT__weight_load_en;
     CData/*0:0*/ systolic_data_setup__DOT__row_valid;
     CData/*1:0*/ systolic_data_setup__DOT__state;
-    CData/*4:0*/ systolic_data_setup__DOT__cycle;
+    CData/*5:0*/ systolic_data_setup__DOT__cycle;
     CData/*0:0*/ __VstlFirstIteration;
     CData/*0:0*/ __VstlPhaseResult;
     CData/*0:0*/ __VicoFirstIteration;
@@ -40,8 +40,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
     CData/*0:0*/ __VactPhaseResult;
     CData/*0:0*/ __VnbaPhaseResult;
     IData/*31:0*/ systolic_data_setup__DOT__unnamedblk3__DOT__j;
-    IData/*31:0*/ systolic_data_setup__DOT__unnamedblk4__DOT__i;
-    IData/*31:0*/ systolic_data_setup__DOT__unnamedblk5__DOT__k;
+    IData/*31:0*/ systolic_data_setup__DOT__unnamedblk4__DOT__k;
     IData/*31:0*/ systolic_data_setup__DOT__unnamedblk1__DOT__i;
     IData/*31:0*/ systolic_data_setup__DOT__unnamedblk1__DOT__unnamedblk2__DOT__j;
     IData/*31:0*/ __VactIterCount;

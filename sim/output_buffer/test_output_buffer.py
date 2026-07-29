@@ -23,8 +23,8 @@ def beats_to_tile(beats):
     """
     tile = [[0] * N for _ in range(N)]
     for b, val in enumerate(beats):
-        row         = b // 4
-        col_base    = (b % 4) * 4
+        row         = b // 4 # every 4 beats is a new row
+        col_base    = (b % 4) * 4 # beat 0 -> cols 0-3, beat 1 -> cols 4-7
         for k in range(4):
             tile[row][col_base + k] = extract_col(val, k)
     return tile

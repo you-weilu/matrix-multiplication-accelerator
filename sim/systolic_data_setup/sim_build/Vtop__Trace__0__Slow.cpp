@@ -20,7 +20,7 @@ VL_ATTR_COLD void Vtop___024root__trace_init_sub__TOP__0(Vtop___024root* vlSelf,
     VL_TRACE_DECL_BIT(tracep,c+0,0,"clk",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BIT(tracep,c+1,0,"rst_n",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BIT(tracep,c+2,0,"start",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
-    VL_TRACE_DECL_BIT(tracep,c+3,0,"done",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
+    VL_TRACE_DECL_BIT(tracep,c+3,0,"pass_done",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BUS(tracep,c+4,0,"weight_buf_addr",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC, 3,0);
 
     Vtop___024root__trace_init_dtype____0(vlSelf, tracep, "weight_buf_data", 0, c+5, VerilatedTraceSigDirection::INPUT);
@@ -44,7 +44,7 @@ VL_ATTR_COLD void Vtop___024root__trace_init_sub__TOP__0(Vtop___024root* vlSelf,
     VL_TRACE_DECL_BIT(tracep,c+72,0,"clk",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BIT(tracep,c+73,0,"rst_n",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BIT(tracep,c+74,0,"start",-1, VerilatedTraceSigDirection::INPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
-    VL_TRACE_DECL_BIT(tracep,c+75,0,"done",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
+    VL_TRACE_DECL_BIT(tracep,c+75,0,"pass_done",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BUS(tracep,c+76,0,"weight_buf_addr",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC, 3,0);
     VL_TRACE_PUSH_PREFIX(tracep, "weight_buf_data", VerilatedTracePrefixType::ARRAY_UNPACKED, 15, 0);
     for (int i = 0; i < 16; ++i) {
@@ -64,7 +64,7 @@ VL_ATTR_COLD void Vtop___024root__trace_init_sub__TOP__0(Vtop___024root* vlSelf,
     Vtop___024root__trace_init_dtype____3(vlSelf, tracep, "act_in", 0, c+127, VerilatedTraceSigDirection::OUTPUT);
     VL_TRACE_DECL_BIT(tracep,c+143,0,"row_valid",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC);
     VL_TRACE_DECL_BUS(tracep,c+144,0,"state",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, 1,0);
-    VL_TRACE_DECL_BUS(tracep,c+145,0,"cycle",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, 4,0);
+    VL_TRACE_DECL_BUS(tracep,c+145,0,"cycle",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, 5,0);
     VL_TRACE_POP_PREFIX(tracep);
 }
 
@@ -211,7 +211,7 @@ VL_ATTR_COLD void Vtop___024root__trace_full_0_sub_0(Vtop___024root* vlSelf, Ver
     bufp->fullBit(oldp+0,(vlSelfRef.clk));
     bufp->fullBit(oldp+1,(vlSelfRef.rst_n));
     bufp->fullBit(oldp+2,(vlSelfRef.start));
-    bufp->fullBit(oldp+3,(vlSelfRef.done));
+    bufp->fullBit(oldp+3,(vlSelfRef.pass_done));
     bufp->fullCData(oldp+4,(vlSelfRef.weight_buf_addr),4);
     Vtop___024root__trace_full_dtype____0(vlSelf, bufp, 5, vlSelfRef.weight_buf_data);
     bufp->fullCData(oldp+21,(vlSelfRef.act_buf_addr),4);
@@ -253,7 +253,7 @@ VL_ATTR_COLD void Vtop___024root__trace_full_0_sub_0(Vtop___024root* vlSelf, Ver
     bufp->fullBit(oldp+72,(vlSelfRef.systolic_data_setup__DOT__clk));
     bufp->fullBit(oldp+73,(vlSelfRef.systolic_data_setup__DOT__rst_n));
     bufp->fullBit(oldp+74,(vlSelfRef.systolic_data_setup__DOT__start));
-    bufp->fullBit(oldp+75,(vlSelfRef.systolic_data_setup__DOT__done));
+    bufp->fullBit(oldp+75,(vlSelfRef.systolic_data_setup__DOT__pass_done));
     bufp->fullCData(oldp+76,(vlSelfRef.systolic_data_setup__DOT__weight_buf_addr),4);
     bufp->fullCData(oldp+77,(vlSelfRef.systolic_data_setup__DOT__weight_buf_data[15]),8);
     bufp->fullCData(oldp+78,(vlSelfRef.systolic_data_setup__DOT__weight_buf_data[14]),8);
@@ -293,7 +293,7 @@ VL_ATTR_COLD void Vtop___024root__trace_full_0_sub_0(Vtop___024root* vlSelf, Ver
     Vtop___024root__trace_full_dtype____3(vlSelf, bufp, 127, vlSelfRef.systolic_data_setup__DOT__act_in);
     bufp->fullBit(oldp+143,(vlSelfRef.systolic_data_setup__DOT__row_valid));
     bufp->fullCData(oldp+144,(vlSelfRef.systolic_data_setup__DOT__state),2);
-    bufp->fullCData(oldp+145,(vlSelfRef.systolic_data_setup__DOT__cycle),5);
+    bufp->fullCData(oldp+145,(vlSelfRef.systolic_data_setup__DOT__cycle),6);
 }
 
 VL_ATTR_COLD void Vtop___024root__trace_full_dtype____0(Vtop___024root* vlSelf, VerilatedVcd::Buffer* bufp, uint32_t offset, const VlUnpacked<CData/*7:0*/, 16>& __VdtypeVar) {

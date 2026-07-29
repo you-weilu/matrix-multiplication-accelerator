@@ -1,0 +1,8 @@
+reports/
+results/
+logs/
+*.srr
+*.vm
+*.vhd
+*.edf
+*.srs

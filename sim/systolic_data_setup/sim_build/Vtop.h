@@ -33,7 +33,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop VL_NOT_FINAL : public VerilatedModel {
     VL_IN8(&clk,0,0);
     VL_IN8(&rst_n,0,0);
     VL_IN8(&start,0,0);
-    VL_OUT8(&done,0,0);
+    VL_OUT8(&pass_done,0,0);
     VL_OUT8(&weight_buf_addr,3,0);
     VL_OUT8(&act_buf_addr,3,0);
     VL_OUT8(&weight_load_en,0,0);

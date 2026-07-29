@@ -35,6 +35,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
     VL_OUT8(fill_start,0,0);
     VL_OUT8(writeback_start,0,0);
     VL_IN8(writeback_done,0,0);
+    VL_IN8(init_done,0,0);
     CData/*0:0*/ tile_sequencer_fsm__DOT__clk;
     CData/*0:0*/ tile_sequencer_fsm__DOT__rst_n;
     CData/*0:0*/ tile_sequencer_fsm__DOT__go;
@@ -56,6 +57,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
     CData/*0:0*/ tile_sequencer_fsm__DOT__fill_start;
     CData/*0:0*/ tile_sequencer_fsm__DOT__writeback_start;
     CData/*0:0*/ tile_sequencer_fsm__DOT__writeback_done;
+    CData/*0:0*/ tile_sequencer_fsm__DOT__init_done;
     CData/*3:0*/ tile_sequencer_fsm__DOT__state;
     CData/*0:0*/ tile_sequencer_fsm__DOT__last_tile;
     CData/*0:0*/ __VstlFirstIteration;

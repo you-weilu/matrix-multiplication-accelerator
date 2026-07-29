@@ -78,7 +78,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         CData/*7:0*/ csr_block_wrap__DOT__dut__DOT__reg_n_tiles;
         CData/*7:0*/ csr_block_wrap__DOT__dut__DOT__reg_k_tiles;
         CData/*0:0*/ csr_block_wrap__DOT__dut__DOT__reg_done;
-        CData/*4:0*/ csr_block_wrap__DOT__dut__DOT__wr_addr_lat;
+        CData/*5:0*/ csr_block_wrap__DOT__dut__DOT__wr_addr_lat;
         CData/*0:0*/ csr_block_wrap__DOT__dut__DOT__wr_commit;
         CData/*1:0*/ csr_block_wrap__DOT__dut__DOT__wr_state;
         CData/*0:0*/ csr_block_wrap__DOT__dut__DOT__rd_state;
@@ -100,8 +100,17 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         IData/*31:0*/ csr_block_wrap__DOT__wdata;
         IData/*31:0*/ csr_block_wrap__DOT__araddr;
         IData/*31:0*/ csr_block_wrap__DOT__rdata;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_a_lo;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_a_hi;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_b_lo;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_b_hi;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_c_lo;
+        IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__reg_base_addr_c_hi;
         IData/*31:0*/ csr_block_wrap__DOT__dut__DOT__wr_data_lat;
         IData/*31:0*/ __VactIterCount;
+        QData/*63:0*/ csr_block_wrap__DOT__dut__DOT__base_addr_a;
+        QData/*63:0*/ csr_block_wrap__DOT__dut__DOT__base_addr_b;
+        QData/*63:0*/ csr_block_wrap__DOT__dut__DOT__base_addr_c;
         VlUnpacked<QData/*63:0*/, 1> __VstlTriggered;
         VlUnpacked<QData/*63:0*/, 1> __VicoTriggered;
         VlUnpacked<QData/*63:0*/, 1> __VactTriggered;

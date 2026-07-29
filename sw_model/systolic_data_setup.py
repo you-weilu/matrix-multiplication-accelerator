@@ -7,16 +7,18 @@
 #   1a: feed weight buffer rows in reverse into the top of the array
 #   1b: copy activation buffer rows into the 256-byte working buffer
 #
-# Phase 2 (31 cycles):
+# Phase 2 (46 cycles = 31 feed + 15 drain):
 #   Feed skewed activations from buffer into array rows.
 #   At cycle t, row k receives buffer[t-k][k] = A[t-k][k] if t >= k, else 0.
+#   Feeding ends at cycle 30; cycles 31-45 drain the array and deskew pipes
+#   (aligned result rows exit col_out at cycles 30-45).
 
 from signal import Signal
 
 class DataSetup:
     TILE_SIZE = 16
     _PRELOAD_CYCLES = TILE_SIZE
-    _FEED_CYCLES    = 2 * TILE_SIZE - 1
+    _FEED_CYCLES    = 3 * TILE_SIZE - 2  # 31 feed + 15 drain
 
     def __init__(self, weight_buf, act_buf, array, start: Signal, done: Signal):
         self._weight_buf = weight_buf

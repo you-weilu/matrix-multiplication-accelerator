@@ -14,6 +14,7 @@ async def reset(dut):
     dut.pass_done.value        = 0
     dut.tile_done.value        = 0
     dut.writeback_done.value   = 0
+    dut.init_done.value        = 1  # DMA init assumed complete in unit test
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1

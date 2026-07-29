@@ -22,9 +22,9 @@ bool Vtop___024root___trigger_anySet__ico(const VlUnpacked<QData/*63:0*/, 1> &in
 #ifdef VL_DEBUG
 VL_ATTR_COLD void Vtop___024root___dump_triggers__ico(const VlUnpacked<QData/*63:0*/, 1> &triggers, const std::string &tag);
 #endif  // VL_DEBUG
-extern const VlUnpacked<CData/*3:0*/, 128> Vtop__ConstPool__TABLE_h0e90d959_0;
-extern const VlUnpacked<CData/*3:0*/, 128> Vtop__ConstPool__TABLE_h423aee05_0;
-extern const VlUnpacked<CData/*0:0*/, 128> Vtop__ConstPool__TABLE_hebea6afc_0;
+extern const VlUnpacked<CData/*3:0*/, 256> Vtop__ConstPool__TABLE_hb6775339_0;
+extern const VlUnpacked<CData/*3:0*/, 256> Vtop__ConstPool__TABLE_h6fb57616_0;
+extern const VlUnpacked<CData/*0:0*/, 256> Vtop__ConstPool__TABLE_h53345b08_0;
 
 bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_phase__ico\n"); );
@@ -51,7 +51,7 @@ bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
             if ((1ULL & vlSelfRef.__VicoTriggered[0U])) {
                 {
                     // Inlined CFunc: _ico_sequent__TOP__0
-                    CData/*6:0*/ __Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0;
+                    CData/*7:0*/ __Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0;
                     __Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0 = 0;
                     vlSelfRef.systolic_data_setup__DOT__clk 
                         = vlSelfRef.clk;
@@ -59,7 +59,7 @@ bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
                         = vlSelfRef.rst_n;
                     vlSelfRef.systolic_data_setup__DOT__start 
                         = vlSelfRef.start;
-                    vlSelfRef.done = vlSelfRef.systolic_data_setup__DOT__done;
+                    vlSelfRef.pass_done = vlSelfRef.systolic_data_setup__DOT__pass_done;
                     vlSelfRef.systolic_data_setup__DOT__weight_buf_data 
                         = vlSelfRef.weight_buf_data;
                     vlSelfRef.systolic_data_setup__DOT__act_buf_data 
@@ -71,13 +71,13 @@ bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
                         = (((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
                             << 2U) | (IData)(vlSelfRef.systolic_data_setup__DOT__state));
                     vlSelfRef.systolic_data_setup__DOT__weight_buf_addr 
-                        = Vtop__ConstPool__TABLE_h0e90d959_0
+                        = Vtop__ConstPool__TABLE_hb6775339_0
                         [__Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.systolic_data_setup__DOT__act_buf_addr 
-                        = Vtop__ConstPool__TABLE_h423aee05_0
+                        = Vtop__ConstPool__TABLE_h6fb57616_0
                         [__Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.systolic_data_setup__DOT__row_valid 
-                        = Vtop__ConstPool__TABLE_hebea6afc_0
+                        = Vtop__ConstPool__TABLE_h53345b08_0
                         [__Vinline_0__eval_ico___Vinline_1__ico_sequent__TOP__0___VdfgRegularize_hebeb780c_0_0];
                     vlSelfRef.weight_buf_addr = vlSelfRef.systolic_data_setup__DOT__weight_buf_addr;
                     vlSelfRef.act_buf_addr = vlSelfRef.systolic_data_setup__DOT__act_buf_addr;
@@ -109,11 +109,11 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Locals
-    CData/*6:0*/ __VdfgRegularize_hebeb780c_0_0;
+    CData/*7:0*/ __VdfgRegularize_hebeb780c_0_0;
     __VdfgRegularize_hebeb780c_0_0 = 0;
     CData/*1:0*/ __Vdly__systolic_data_setup__DOT__state;
     __Vdly__systolic_data_setup__DOT__state = 0;
-    CData/*4:0*/ __Vdly__systolic_data_setup__DOT__cycle;
+    CData/*5:0*/ __Vdly__systolic_data_setup__DOT__cycle;
     __Vdly__systolic_data_setup__DOT__cycle = 0;
     CData/*7:0*/ __VdlyVal__systolic_data_setup__DOT__weight_in__v0;
     __VdlyVal__systolic_data_setup__DOT__weight_in__v0 = 0;
@@ -125,14 +125,12 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
     __VdlyDim0__systolic_data_setup__DOT__buf_work__v0 = 0;
     CData/*3:0*/ __VdlyDim1__systolic_data_setup__DOT__buf_work__v0;
     __VdlyDim1__systolic_data_setup__DOT__buf_work__v0 = 0;
-    CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__weight_in__v1;
-    __VdlyDim0__systolic_data_setup__DOT__weight_in__v1 = 0;
     CData/*7:0*/ __VdlyVal__systolic_data_setup__DOT__act_in__v0;
     __VdlyVal__systolic_data_setup__DOT__act_in__v0 = 0;
     CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__act_in__v0;
     __VdlyDim0__systolic_data_setup__DOT__act_in__v0 = 0;
-    CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__weight_in__v2;
-    __VdlyDim0__systolic_data_setup__DOT__weight_in__v2 = 0;
+    CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__weight_in__v1;
+    __VdlyDim0__systolic_data_setup__DOT__weight_in__v1 = 0;
     CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__act_in__v1;
     __VdlyDim0__systolic_data_setup__DOT__act_in__v1 = 0;
     CData/*3:0*/ __VdlyDim0__systolic_data_setup__DOT__buf_work__v1;
@@ -143,7 +141,7 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
     __Vdly__systolic_data_setup__DOT__state = vlSelfRef.systolic_data_setup__DOT__state;
     __Vdly__systolic_data_setup__DOT__cycle = vlSelfRef.systolic_data_setup__DOT__cycle;
     if (vlSelfRef.systolic_data_setup__DOT__rst_n) {
-        vlSelfRef.systolic_data_setup__DOT__done = 0U;
+        vlSelfRef.systolic_data_setup__DOT__pass_done = 0U;
         vlSelfRef.systolic_data_setup__DOT__weight_load_en = 0U;
         if ((0U == (IData)(vlSelfRef.systolic_data_setup__DOT__state))) {
             if (vlSelfRef.systolic_data_setup__DOT__start) {
@@ -172,46 +170,38 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
                     = ((IData)(1U) + vlSelfRef.systolic_data_setup__DOT__unnamedblk3__DOT__j);
             }
             if ((0x0fU == (IData)(vlSelfRef.systolic_data_setup__DOT__cycle))) {
-                vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__i = 0U;
                 __Vdly__systolic_data_setup__DOT__state = 2U;
                 __Vdly__systolic_data_setup__DOT__cycle = 0U;
-                while (VL_GTS_III(32, 0x00000010U, vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__i)) {
-                    __VdlyDim0__systolic_data_setup__DOT__weight_in__v1 
-                        = (0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__i);
-                    vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__weight_in.enqueue(0U, (IData)(__VdlyDim0__systolic_data_setup__DOT__weight_in__v1));
-                    vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__i 
-                        = ((IData)(1U) + vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__i);
-                }
             } else {
                 __Vdly__systolic_data_setup__DOT__cycle 
-                    = (0x0000001fU & ((IData)(1U) + (IData)(vlSelfRef.systolic_data_setup__DOT__cycle)));
+                    = (0x0000003fU & ((IData)(1U) + (IData)(vlSelfRef.systolic_data_setup__DOT__cycle)));
             }
         } else if ((2U == (IData)(vlSelfRef.systolic_data_setup__DOT__state))) {
-            vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k = 0U;
-            while (VL_GTS_III(32, 0x00000010U, vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k)) {
+            vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k = 0U;
+            while (VL_GTS_III(32, 0x00000010U, vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k)) {
                 __VdlyVal__systolic_data_setup__DOT__act_in__v0 
                     = ((((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
-                         >= (0x0000001fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k)) 
-                        & (0x10U > (0x0000001fU & ((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
-                                                   - vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k))))
+                         >= (0x0000003fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k)) 
+                        & (0x10U > (0x0000003fU & ((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
+                                                   - vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k))))
                         ? vlSelfRef.systolic_data_setup__DOT__buf_work
                        [(0x0000000fU & ((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
-                                        - vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k))]
-                       [(0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k)]
+                                        - vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k))]
+                       [(0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k)]
                         : 0U);
                 __VdlyDim0__systolic_data_setup__DOT__act_in__v0 
-                    = (0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k);
+                    = (0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k);
                 vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__act_in.enqueue(__VdlyVal__systolic_data_setup__DOT__act_in__v0, (IData)(__VdlyDim0__systolic_data_setup__DOT__act_in__v0));
-                vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k 
-                    = ((IData)(1U) + vlSelfRef.systolic_data_setup__DOT__unnamedblk5__DOT__k);
+                vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k 
+                    = ((IData)(1U) + vlSelfRef.systolic_data_setup__DOT__unnamedblk4__DOT__k);
             }
-            if ((0x1eU == (IData)(vlSelfRef.systolic_data_setup__DOT__cycle))) {
+            if ((0x2fU == (IData)(vlSelfRef.systolic_data_setup__DOT__cycle))) {
                 __Vdly__systolic_data_setup__DOT__state = 0U;
-                vlSelfRef.systolic_data_setup__DOT__done = 1U;
+                vlSelfRef.systolic_data_setup__DOT__pass_done = 1U;
                 __Vdly__systolic_data_setup__DOT__cycle = 0U;
             } else {
                 __Vdly__systolic_data_setup__DOT__cycle 
-                    = (0x0000001fU & ((IData)(1U) + (IData)(vlSelfRef.systolic_data_setup__DOT__cycle)));
+                    = (0x0000003fU & ((IData)(1U) + (IData)(vlSelfRef.systolic_data_setup__DOT__cycle)));
             }
         } else {
             __Vdly__systolic_data_setup__DOT__state = 0U;
@@ -220,12 +210,12 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
         vlSelfRef.systolic_data_setup__DOT__unnamedblk1__DOT__i = 0U;
         __Vdly__systolic_data_setup__DOT__state = 0U;
         __Vdly__systolic_data_setup__DOT__cycle = 0U;
-        vlSelfRef.systolic_data_setup__DOT__done = 0U;
+        vlSelfRef.systolic_data_setup__DOT__pass_done = 0U;
         vlSelfRef.systolic_data_setup__DOT__weight_load_en = 0U;
         while (VL_GTS_III(32, 0x00000010U, vlSelfRef.systolic_data_setup__DOT__unnamedblk1__DOT__i)) {
-            __VdlyDim0__systolic_data_setup__DOT__weight_in__v2 
+            __VdlyDim0__systolic_data_setup__DOT__weight_in__v1 
                 = (0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk1__DOT__i);
-            vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__weight_in.enqueue(0U, (IData)(__VdlyDim0__systolic_data_setup__DOT__weight_in__v2));
+            vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__weight_in.enqueue(0U, (IData)(__VdlyDim0__systolic_data_setup__DOT__weight_in__v1));
             __VdlyDim0__systolic_data_setup__DOT__act_in__v1 
                 = (0x0000000fU & vlSelfRef.systolic_data_setup__DOT__unnamedblk1__DOT__i);
             vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__act_in.enqueue(0U, (IData)(__VdlyDim0__systolic_data_setup__DOT__act_in__v1));
@@ -248,17 +238,17 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
     vlSelfRef.__VdlyCommitQueuesystolic_data_setup__DOT__act_in.commit(vlSelfRef.systolic_data_setup__DOT__act_in);
     vlSelfRef.systolic_data_setup__DOT__state = __Vdly__systolic_data_setup__DOT__state;
     vlSelfRef.systolic_data_setup__DOT__cycle = __Vdly__systolic_data_setup__DOT__cycle;
-    vlSelfRef.done = vlSelfRef.systolic_data_setup__DOT__done;
+    vlSelfRef.pass_done = vlSelfRef.systolic_data_setup__DOT__pass_done;
     vlSelfRef.weight_load_en = vlSelfRef.systolic_data_setup__DOT__weight_load_en;
     vlSelfRef.weight_in = vlSelfRef.systolic_data_setup__DOT__weight_in;
     vlSelfRef.act_in = vlSelfRef.systolic_data_setup__DOT__act_in;
     __VdfgRegularize_hebeb780c_0_0 = (((IData)(vlSelfRef.systolic_data_setup__DOT__cycle) 
                                        << 2U) | (IData)(vlSelfRef.systolic_data_setup__DOT__state));
     vlSelfRef.systolic_data_setup__DOT__weight_buf_addr 
-        = Vtop__ConstPool__TABLE_h0e90d959_0[__VdfgRegularize_hebeb780c_0_0];
+        = Vtop__ConstPool__TABLE_hb6775339_0[__VdfgRegularize_hebeb780c_0_0];
     vlSelfRef.systolic_data_setup__DOT__act_buf_addr 
-        = Vtop__ConstPool__TABLE_h423aee05_0[__VdfgRegularize_hebeb780c_0_0];
-    vlSelfRef.systolic_data_setup__DOT__row_valid = Vtop__ConstPool__TABLE_hebea6afc_0
+        = Vtop__ConstPool__TABLE_h6fb57616_0[__VdfgRegularize_hebeb780c_0_0];
+    vlSelfRef.systolic_data_setup__DOT__row_valid = Vtop__ConstPool__TABLE_h53345b08_0
         [__VdfgRegularize_hebeb780c_0_0];
     vlSelfRef.weight_buf_addr = vlSelfRef.systolic_data_setup__DOT__weight_buf_addr;
     vlSelfRef.act_buf_addr = vlSelfRef.systolic_data_setup__DOT__act_buf_addr;

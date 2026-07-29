@@ -44,11 +44,28 @@ module systolic_array (
         end
     endgenerate
 
-    // partial sums exiting the bottom row
+    // Deskew: result row r exits the bottom of column c one cycle later per
+    // column. Delay column c by (15 - c) cycles so col_out presents one fully
+    // aligned result row per cycle, matching column 15's timing.
     genvar k;
     generate
-        for (k = 0; k < 16; k++) begin : col_out_assign
-            assign col_out[k] = psum_wire[15][k];
+        for (k = 0; k < 16; k++) begin : col_deskew
+            if (k == 15) begin : g_pass
+                assign col_out[k] = psum_wire[15][k];
+            end else begin : g_delay
+                logic [31:0] pipe [15-k];
+                always_ff @(posedge clk) begin
+                    if (!rst_n) begin
+                        for (int d = 0; d < 15-k; d++)
+                            pipe[d] <= 0;
+                    end else begin
+                        pipe[0] <= psum_wire[15][k];
+                        for (int d = 1; d < 15-k; d++)
+                            pipe[d] <= pipe[d-1];
+                    end
+                end
+                assign col_out[k] = pipe[15-k-1];
+            end
         end
     endgenerate
 

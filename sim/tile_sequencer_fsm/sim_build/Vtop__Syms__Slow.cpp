@@ -33,6 +33,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_TOP->varInsert("fill_weight_done", &(TOP.fill_weight_done), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("final_pass", &(TOP.final_pass), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("go", &(TOP.go), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
+    __Vscopep_TOP->varInsert("init_done", &(TOP.init_done), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("k_tile", &(TOP.k_tile), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 0, 1 ,7,0);
     __Vscopep_TOP->varInsert("k_tiles", &(TOP.k_tiles), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 1 ,7,0);
     __Vscopep_TOP->varInsert("m_tiles", &(TOP.m_tiles), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 1 ,7,0);
@@ -54,6 +55,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_tile_sequencer_fsm->varInsert("fill_weight_done", &(TOP.tile_sequencer_fsm__DOT__fill_weight_done), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_tile_sequencer_fsm->varInsert("final_pass", &(TOP.tile_sequencer_fsm__DOT__final_pass), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_tile_sequencer_fsm->varInsert("go", &(TOP.tile_sequencer_fsm__DOT__go), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
+    __Vscopep_tile_sequencer_fsm->varInsert("init_done", &(TOP.tile_sequencer_fsm__DOT__init_done), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_tile_sequencer_fsm->varInsert("k_tile", &(TOP.tile_sequencer_fsm__DOT__k_tile), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 1 ,7,0);
     __Vscopep_tile_sequencer_fsm->varInsert("k_tiles", &(TOP.tile_sequencer_fsm__DOT__k_tiles), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 1 ,7,0);
     __Vscopep_tile_sequencer_fsm->varInsert("last_tile", &(TOP.tile_sequencer_fsm__DOT__last_tile), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);

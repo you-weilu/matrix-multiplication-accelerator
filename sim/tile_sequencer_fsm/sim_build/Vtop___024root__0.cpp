@@ -80,6 +80,8 @@ bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
                     vlSelfRef.writeback_start = vlSelfRef.tile_sequencer_fsm__DOT__writeback_start;
                     vlSelfRef.tile_sequencer_fsm__DOT__writeback_done 
                         = vlSelfRef.writeback_done;
+                    vlSelfRef.tile_sequencer_fsm__DOT__init_done 
+                        = vlSelfRef.init_done;
                 }
             }
         }
@@ -202,7 +204,8 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
             }
         } else {
             vlSelfRef.tile_sequencer_fsm__DOT__ts_busy = 0U;
-            if (vlSelfRef.tile_sequencer_fsm__DOT__go) {
+            if (((IData)(vlSelfRef.tile_sequencer_fsm__DOT__go) 
+                 & (IData)(vlSelfRef.tile_sequencer_fsm__DOT__init_done))) {
                 vlSelfRef.tile_sequencer_fsm__DOT__tile_i = 0U;
                 __Vdly__tile_sequencer_fsm__DOT__tile_j = 0U;
                 __Vdly__tile_sequencer_fsm__DOT__state = 1U;
@@ -386,6 +389,9 @@ void Vtop___024root___eval_debug_assertions(Vtop___024root* vlSelf) {
     }
     if (VL_UNLIKELY(((vlSelfRef.writeback_done & 0xfeU)))) {
         Verilated::overWidthError("writeback_done");
+    }
+    if (VL_UNLIKELY(((vlSelfRef.init_done & 0xfeU)))) {
+        Verilated::overWidthError("init_done");
     }
 }
 #endif  // VL_DEBUG

@@ -198,7 +198,13 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
         vlSelfRef.output_buffer_wrap__DOT__dut__DOT__state = 0U;
         vlSymsp->TOP__output_buffer_wrap__DOT__c2h_axi.rvalid = 0U;
     }
-    if (vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_wen) {
+    if (VL_UNLIKELY((vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_wen))) {
+        VL_WRITEF_NX("[outbuf] buf_wen row=%0d data[0]=%0d data[1]=%0d data[2]=%0d data[3]=%0d\n",5
+                     , '#',4,vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_row
+                     , '~',32,vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_data[0U]
+                     , '~',32,vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_data[1U]
+                     , '~',32,vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_data[2U]
+                     , '~',32,vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_data[3U]);
         __VdlyVal__output_buffer_wrap__DOT__dut__DOT__mem__v0[0U] 
             = vlSelfRef.output_buffer_wrap__DOT__dut__DOT__buf_data[0U];
         __VdlyVal__output_buffer_wrap__DOT__dut__DOT__mem__v0[1U] 

@@ -36,8 +36,9 @@ async def run_tile_pass(dut, weight_tile, act_tile):
             dut.act_buf_data[j].value    = act_tile[a_addr][j]    & 0xFF
         await RisingEdge(dut.clk)
 
-    # FEED: 31 cycles - SDS no longer reads buffers, just drives act_in
-    for _ in range(31):
+    # FEED: 48 cycles (feeding ends at cycle 30, then drains the array and
+    # deskew pipes through cycle 47) - SDS no longer reads buffers
+    for _ in range(48):
         await RisingEdge(dut.clk)
 
     # wait one more cycle for done to be visible
@@ -91,7 +92,7 @@ async def test_weight_load_en(dut):
 
 @cocotb.test()
 async def test_row_valid_timing(dut):
-    """row_valid goes high at cycle 15 of FEED and stays high for 16 cycles."""
+    """row_valid goes high at cycle 32 of FEED and stays high for 16 cycles."""
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
     await reset(dut)
 
@@ -107,16 +108,16 @@ async def test_row_valid_timing(dut):
         await RisingEdge(dut.clk)
         assert int(dut.row_valid.value) == 0, "row_valid should be 0 during PRELOAD"
 
-    # FEED cycles 0-14: row_valid should be 0
-    for i in range(15):
+    # FEED cycles 0-31: row_valid should be 0 (array + deskew still filling)
+    for i in range(32):
         assert int(dut.row_valid.value) == 0, f"row_valid should be 0 at FEED cycle {i}"
         await RisingEdge(dut.clk)
 
     await RisingEdge(dut.clk)
 
-    # FEED cycles 15-30: row_valid should be 1
+    # FEED cycles 32-47: row_valid should be 1
     for i in range(16):
-        assert int(dut.row_valid.value) == 1, f"row_valid should be 1 at FEED cycle {i + 15}"
+        assert int(dut.row_valid.value) == 1, f"row_valid should be 1 at FEED cycle {i + 32}"
         await RisingEdge(dut.clk)
 
 

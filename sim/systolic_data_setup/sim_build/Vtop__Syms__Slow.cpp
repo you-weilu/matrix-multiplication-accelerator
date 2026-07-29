@@ -11,7 +11,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     , TOP{this, namep}
 {
     // Check resources
-    Verilated::stackCheck(284);
+    Verilated::stackCheck(282);
     // Setup sub module instances
     // Configure time unit / time precision
     _vm_contextp__->timeunit(-9);
@@ -26,13 +26,11 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2 = new VerilatedScope{this, "systolic_data_setup.unnamedblk1.unnamedblk2", "unnamedblk2", "<null>", -9, VerilatedScope::SCOPE_OTHER};
     __Vscopep_systolic_data_setup__unnamedblk3 = new VerilatedScope{this, "systolic_data_setup.unnamedblk3", "unnamedblk3", "<null>", -9, VerilatedScope::SCOPE_OTHER};
     __Vscopep_systolic_data_setup__unnamedblk4 = new VerilatedScope{this, "systolic_data_setup.unnamedblk4", "unnamedblk4", "<null>", -9, VerilatedScope::SCOPE_OTHER};
-    __Vscopep_systolic_data_setup__unnamedblk5 = new VerilatedScope{this, "systolic_data_setup.unnamedblk5", "unnamedblk5", "<null>", -9, VerilatedScope::SCOPE_OTHER};
     // Set up scope hierarchy
     __Vhier.add(0, __Vscopep_systolic_data_setup);
     __Vhier.add(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk1);
     __Vhier.add(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk3);
     __Vhier.add(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk4);
-    __Vhier.add(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk5);
     __Vhier.add(__Vscopep_systolic_data_setup__unnamedblk1, __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2);
     // Setup export functions - final: 0
     // Setup export functions - final: 1
@@ -41,7 +39,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_TOP->varInsert("act_buf_data", &(TOP.act_buf_data), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 1, 1 ,15,0 ,7,0);
     __Vscopep_TOP->varInsert("act_in", &(TOP.act_in), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 1, 1 ,15,0 ,7,0);
     __Vscopep_TOP->varInsert("clk", &(TOP.clk), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
-    __Vscopep_TOP->varInsert("done", &(TOP.done), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 0, 0);
+    __Vscopep_TOP->varInsert("pass_done", &(TOP.pass_done), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("row_valid", &(TOP.row_valid), false, VLVT_UINT8, VLVD_OUT|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("rst_n", &(TOP.rst_n), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
     __Vscopep_TOP->varInsert("start", &(TOP.start), false, VLVT_UINT8, VLVD_IN|VLVF_PUB_RW, 0, 0);
@@ -54,8 +52,8 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_systolic_data_setup->varInsert("act_in", &(TOP.systolic_data_setup__DOT__act_in), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 1, 1 ,15,0 ,7,0);
     __Vscopep_systolic_data_setup->varInsert("buf_work", &(TOP.systolic_data_setup__DOT__buf_work), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 2, 1 ,15,0 ,15,0 ,7,0);
     __Vscopep_systolic_data_setup->varInsert("clk", &(TOP.systolic_data_setup__DOT__clk), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
-    __Vscopep_systolic_data_setup->varInsert("cycle", &(TOP.systolic_data_setup__DOT__cycle), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 1 ,4,0);
-    __Vscopep_systolic_data_setup->varInsert("done", &(TOP.systolic_data_setup__DOT__done), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
+    __Vscopep_systolic_data_setup->varInsert("cycle", &(TOP.systolic_data_setup__DOT__cycle), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 1 ,5,0);
+    __Vscopep_systolic_data_setup->varInsert("pass_done", &(TOP.systolic_data_setup__DOT__pass_done), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_systolic_data_setup->varInsert("row_valid", &(TOP.systolic_data_setup__DOT__row_valid), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_systolic_data_setup->varInsert("rst_n", &(TOP.systolic_data_setup__DOT__rst_n), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
     __Vscopep_systolic_data_setup->varInsert("start", &(TOP.systolic_data_setup__DOT__start), false, VLVT_UINT8, VLVD_NODIR|VLVF_PUB_RW, 0, 0);
@@ -67,8 +65,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     __Vscopep_systolic_data_setup__unnamedblk1->varInsert("i", &(TOP.systolic_data_setup__DOT__unnamedblk1__DOT__i), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
     __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2->varInsert("j", &(TOP.systolic_data_setup__DOT__unnamedblk1__DOT__unnamedblk2__DOT__j), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
     __Vscopep_systolic_data_setup__unnamedblk3->varInsert("j", &(TOP.systolic_data_setup__DOT__unnamedblk3__DOT__j), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
-    __Vscopep_systolic_data_setup__unnamedblk4->varInsert("i", &(TOP.systolic_data_setup__DOT__unnamedblk4__DOT__i), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
-    __Vscopep_systolic_data_setup__unnamedblk5->varInsert("k", &(TOP.systolic_data_setup__DOT__unnamedblk5__DOT__k), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
+    __Vscopep_systolic_data_setup__unnamedblk4->varInsert("k", &(TOP.systolic_data_setup__DOT__unnamedblk4__DOT__k), false, VLVT_UINT32, VLVD_NODIR|VLVF_PUB_RW|VLVF_DPI_CLAY|VLVF_SIGNED, 0, 1 ,31,0);
 }
 
 Vtop__Syms::~Vtop__Syms() {
@@ -77,7 +74,6 @@ Vtop__Syms::~Vtop__Syms() {
     __Vhier.remove(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk1);
     __Vhier.remove(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk3);
     __Vhier.remove(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk4);
-    __Vhier.remove(__Vscopep_systolic_data_setup, __Vscopep_systolic_data_setup__unnamedblk5);
     __Vhier.remove(__Vscopep_systolic_data_setup__unnamedblk1, __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2);
     // Clear keys from hierarchy map after values have been removed
     __Vhier.clear();
@@ -88,6 +84,5 @@ Vtop__Syms::~Vtop__Syms() {
     VL_DO_CLEAR(delete __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2, __Vscopep_systolic_data_setup__unnamedblk1__unnamedblk2 = nullptr);
     VL_DO_CLEAR(delete __Vscopep_systolic_data_setup__unnamedblk3, __Vscopep_systolic_data_setup__unnamedblk3 = nullptr);
     VL_DO_CLEAR(delete __Vscopep_systolic_data_setup__unnamedblk4, __Vscopep_systolic_data_setup__unnamedblk4 = nullptr);
-    VL_DO_CLEAR(delete __Vscopep_systolic_data_setup__unnamedblk5, __Vscopep_systolic_data_setup__unnamedblk5 = nullptr);
     // Tear down sub module instances
 }
