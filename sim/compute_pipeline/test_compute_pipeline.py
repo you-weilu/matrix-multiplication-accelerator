@@ -202,7 +202,7 @@ async def axi4_write_fa(dut, beats_128):
 
 
 async def axi4_read_output(dut):
-    """Issue a 64-beat AXI4 burst read on ob_*. Returns list of 64 int values."""
+    """Issue a 128-beat AXI4 burst read on ob_*. Returns list of 128 int values."""
     dut.ob_rready.value  = 1
     # Wait for arready registered high before presenting arvalid. The output buffer
     # checks (arvalid && arready_reg) to trigger the burst — if arvalid arrives while

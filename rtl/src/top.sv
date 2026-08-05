@@ -8,9 +8,9 @@
 // the IP or when the block design assigns different addresses.
 
 module top #(
-    parameter logic [63:0] PP_WEIGHT_AXI_BASE  = 64'h0000_0000_4000_0000,
-    parameter logic [63:0] PP_ACT_AXI_BASE     = 64'h0000_0000_4000_0100,
-    parameter logic [63:0] OUTPUT_BUF_AXI_BASE = 64'h0000_0000_4000_0200
+    parameter logic [63:0] PP_WEIGHT_AXI_BASE  = 64'h0000_0000_44A0_0000, // 64KB: 0x44A00000–0x44A0FFFF
+    parameter logic [63:0] PP_ACT_AXI_BASE     = 64'h0000_0000_44A1_0000, // 64KB: 0x44A10000–0x44A1FFFF
+    parameter logic [63:0] OUTPUT_BUF_AXI_BASE = 64'h0000_0000_44A2_0000  // 64KB: 0x44A20000–0x44A2FFFF
 ) (
     // CSR AXI4-Lite slave — clock and reset sourced from this interface
     axi_lite_if.slave  csr_axi,
