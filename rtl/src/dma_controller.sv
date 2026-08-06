@@ -90,24 +90,26 @@ module dma_controller (
     typedef enum logic [1:0] { IDLE, PUSH, WAIT_DONE } state_t;
     state_t w_state, a_state, c_state;
 
-    // Address computations
-    always_comb begin
+    // Address computations: change from comb to egistered to break the long path from
+    // reg_k_tiles through the 64-bit multiply-add chain to XDMA's descriptor FIFO.
+    // Addresses are stable at least one cycle before load is asserted (IDLE→PUSH
+    // takes one cycle after fill_start, so the registered value is always ready).
+    always_ff @(posedge clk) begin
         // H2C ch0: weight tile (matrix B)
-        h2c_dsc_byp_src_addr_0 = base_addr_b + ((64'(tile_j) * 64'(k_tiles) + 64'(k_tile)) << 8);
-        h2c_dsc_byp_dst_addr_0 = pp_weight_axi_base;
-        h2c_dsc_byp_len_0      = 28'd256;
-        h2c_dsc_byp_ctl_0      = 16'h0003; // completed + stop always HIGH (single descriptor transfers)
+        h2c_dsc_byp_src_addr_0 <= base_addr_b + ((64'(tile_j) * 64'(k_tiles) + 64'(k_tile)) << 8);
+        h2c_dsc_byp_dst_addr_0 <= pp_weight_axi_base;
+        h2c_dsc_byp_len_0      <= 28'd256;
+        h2c_dsc_byp_ctl_0      <= 16'h0003;
         // H2C ch1: activation tile (matrix A)
-        h2c_dsc_byp_src_addr_1 = base_addr_a + ((64'(tile_i) * 64'(k_tiles) + 64'(k_tile)) << 8);
-        h2c_dsc_byp_dst_addr_1 = pp_act_axi_base;
-        h2c_dsc_byp_len_1      = 28'd256;
-        h2c_dsc_byp_ctl_1      = 16'h0003;
+        h2c_dsc_byp_src_addr_1 <= base_addr_a + ((64'(tile_i) * 64'(k_tiles) + 64'(k_tile)) << 8);
+        h2c_dsc_byp_dst_addr_1 <= pp_act_axi_base;
+        h2c_dsc_byp_len_1      <= 28'd256;
+        h2c_dsc_byp_ctl_1      <= 16'h0003;
         // C2H ch0: output tile (matrix C)
-        c2h_dsc_byp_src_addr_0 = output_buf_axi_base;
-        c2h_dsc_byp_dst_addr_0 = base_addr_c + ((64'(tile_i) * 64'(n_tiles) + 64'(tile_j)) << 10);
-        c2h_dsc_byp_len_0      = 28'd1024;
-        c2h_dsc_byp_ctl_0      = 16'h0003;
-
+        c2h_dsc_byp_src_addr_0 <= output_buf_axi_base;
+        c2h_dsc_byp_dst_addr_0 <= base_addr_c + ((64'(tile_i) * 64'(n_tiles) + 64'(tile_j)) << 10);
+        c2h_dsc_byp_len_0      <= 28'd1024;
+        c2h_dsc_byp_ctl_0      <= 16'h0003;
     end
 
     // H2C ch0 (WEIGHT) FSM
