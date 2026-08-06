@@ -21,11 +21,12 @@ module pe (
     output logic [31:0] out_partial
 );
     logic [7:0] weight;
+    (* use_dsp = "yes" *) logic [31:0] partial_reg;
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             weight <= 0;
-            out_partial <= 0;
+            partial_reg <= 0;
             out_act <= 0;
             weight_out <= 0;
         end
@@ -34,9 +35,11 @@ module pe (
             weight_out <= weight_in;
         end
         else begin
-            out_partial <= $signed(in_act) * $signed(weight) + $signed(in_partial);
+            partial_reg <= $signed(in_act) * $signed(weight) + $signed(in_partial);
             out_act <= in_act;
         end
     end
+
+    assign out_partial = partial_reg;
 
 endmodule
