@@ -29,14 +29,12 @@ module output_buffer (
 );
 
     // 64 x 128-bit words = 1024 bytes
-    logic [127:0] mem [63:0];
+    (* ram_style = "registers" *) logic [127:0] mem [63:0];
 
     // Write: one accumulator row (16 x 32-bit) maps to 4 consecutive 128-bit words (AXI data bus is 128-bit)
     // buf_data[0] lands in bits [31:0] of the first word (little-endian column order).
     always_ff @(posedge clk) begin
         if (buf_wen) begin
-            $display("[outbuf] buf_wen row=%0d data[0]=%0d data[1]=%0d data[2]=%0d data[3]=%0d",
-                     buf_row, $signed(buf_data[0]), $signed(buf_data[1]), $signed(buf_data[2]), $signed(buf_data[3]));
             mem[{buf_row, 2'b00}] <= {buf_data[3],  buf_data[2],  buf_data[1],  buf_data[0]};
             mem[{buf_row, 2'b01}] <= {buf_data[7],  buf_data[6],  buf_data[5],  buf_data[4]};
             mem[{buf_row, 2'b10}] <= {buf_data[11], buf_data[10], buf_data[9],  buf_data[8]};
