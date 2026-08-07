@@ -94,29 +94,33 @@ module dma_controller (
     // reg_k_tiles through the 64-bit multiply-add chain to XDMA's descriptor FIFO.
     // Addresses are stable at least one cycle before load is asserted (IDLE→PUSH
     // takes one cycle after fill_start, so the registered value is always ready).
-    // Narrow offsets computed in 16-bit (max 255*255+255=65280 fits) to avoid
-    // inferring a 64x64 multiplier from the original 64'() casts.
-    logic [15:0] weight_offset, act_offset, out_offset;
-    always_comb begin
-        weight_offset = 16'(tile_j) * 16'(k_tiles) + 16'(k_tile);
-        act_offset    = 16'(tile_i) * 16'(k_tiles) + 16'(k_tile);
-        out_offset    = 16'(tile_i) * 16'(n_tiles) + 16'(tile_j);
+    
+    // Cycle 1: compute tile offsets in 16-bit (max 255*255+255=65280 fits).
+    // Registered to break the path: cross-module route from reg_k_tiles (csr_block)
+    // feeds only into this narrow multiply-add, not the full 64-bit adder.
+    logic [15:0] weight_offset_r, act_offset_r, out_offset_r;
+    always_ff @(posedge clk) begin
+        weight_offset_r <= 16'(tile_j) * 16'(k_tiles) + 16'(k_tile);
+        act_offset_r    <= 16'(tile_i) * 16'(k_tiles) + 16'(k_tile);
+        out_offset_r    <= 16'(tile_i) * 16'(n_tiles) + 16'(tile_j);
     end
 
+    // Cycle 2: add registered offset to base address.
+    // Short local path: offset_r FF and base_addr FF are both inside dma_controller.
     always_ff @(posedge clk) begin
         // H2C ch0: weight tile (matrix B)
-        h2c_dsc_byp_src_addr_0 <= base_addr_b + (64'(weight_offset) << 8);
+        h2c_dsc_byp_src_addr_0 <= base_addr_b + (64'(weight_offset_r) << 8);
         h2c_dsc_byp_dst_addr_0 <= pp_weight_axi_base;
         h2c_dsc_byp_len_0      <= 28'd256;
         h2c_dsc_byp_ctl_0      <= 16'h0003;
         // H2C ch1: activation tile (matrix A)
-        h2c_dsc_byp_src_addr_1 <= base_addr_a + (64'(act_offset) << 8);
+        h2c_dsc_byp_src_addr_1 <= base_addr_a + (64'(act_offset_r) << 8);
         h2c_dsc_byp_dst_addr_1 <= pp_act_axi_base;
         h2c_dsc_byp_len_1      <= 28'd256;
         h2c_dsc_byp_ctl_1      <= 16'h0003;
         // C2H ch0: output tile (matrix C)
         c2h_dsc_byp_src_addr_0 <= output_buf_axi_base;
-        c2h_dsc_byp_dst_addr_0 <= base_addr_c + (64'(out_offset) << 10);
+        c2h_dsc_byp_dst_addr_0 <= base_addr_c + (64'(out_offset_r) << 10);
         c2h_dsc_byp_len_0      <= 28'd1024;
         c2h_dsc_byp_ctl_0      <= 16'h0003;
     end
