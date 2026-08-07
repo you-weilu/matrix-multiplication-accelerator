@@ -1,0 +1,22 @@
+# Vivado project generated outputs
+*.xpr
+*.jou
+*.log
+*.str
+*.mif
+*.bit
+*.ltx
+
+# Vivado generated directories
+.Xil/
+*/project.cache/
+*/project.hw/
+*/project.ip_user_files/
+*/project.runs/
+*/project.sim/
+*/.srcs/
+NA/
+
+# Vivado backup files
+vivado_*.backup.jou
+vivado_*.backup.log
